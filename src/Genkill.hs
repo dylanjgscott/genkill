@@ -37,29 +37,11 @@ genkill
     -> (Graph a -> Node a -> [Node a])
     -> (Graph a -> Node a -> [Node a])
     -> [(Node a, [Node a], [Node a])]
-genkill g@(Graph ns es) gen kill = [(n, labelin g gen kill n, labelout g gen kill n) | n <- ns]
-
-labelin
-    :: Eq a
-    => Graph a
-    -> (Graph a -> Node a -> [Node a])
-    -> (Graph a -> Node a -> [Node a])
-    -> Node a
-    -> [Node a]
-labelin g@(Graph ns es) gen kill n = foldl union [] [labelout g gen kill p | p <- pred es n]
+genkill g@(Graph ns es) gen kill = [(n, labelin n, labelout n) | n <- ns]
     where
-    pred :: Eq a => [Edge a] -> Node a -> [Node a]
+    labelin n = foldl union [] [labelout p | p <- pred es n]
+    labelout n = union (gen g n) ((labelin n) \\ (kill g n))
     pred [] _ = []
     pred ((Edge (src, dst)):es) n
         | n == dst = src : pred es n
         | otherwise = pred es n
-
-labelout
-    :: Eq a
-    => Graph a
-    -> (Graph a -> Node a -> [Node a])
-    -> (Graph a -> Node a -> [Node a])
-    -> Node a
-    -> [Node a]
-labelout g@(Graph ns es) gen kill n = union (gen g n) ((labelin g gen kill n) \\ (kill g n))
-
