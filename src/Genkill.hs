@@ -32,11 +32,11 @@ kill g@(Graph ns es) n@(Node x) = if length x == 2 then overlapping (x!!1) (dele
             | otherwise = overlapping c ns
 
 genkill
-    :: Eq a
+    :: (Eq a, Eq b)
     => Graph a
-    -> (Graph a -> Node a -> [Node a])
-    -> (Graph a -> Node a -> [Node a])
-    -> [(Node a, [Node a], [Node a])]
+    -> (Graph a -> Node a -> [b])
+    -> (Graph a -> Node a -> [b])
+    -> [(Node a, [b], [b])]
 genkill g@(Graph ns es) gen kill = [(n, labelin n, labelout n) | n <- ns]
     where
     labelin n = foldl union [] [labelout p | p <- pred es n]
