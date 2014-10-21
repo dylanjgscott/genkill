@@ -1,3 +1,5 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Genkill where
 
 import Data.List
@@ -38,15 +40,22 @@ kill g@(Graph ns es) n@(Node x) =
                 | otherwise = overlapping c ns
 
 genkill
-    :: (Eq a, Eq b)
+    :: forall a b . (Eq a, Eq b)
     => Graph a
     -> Gen a b
     -> Kill a b
     -> [(Node a, [b], [b])]
 genkill g@(Graph ns es) gen kill = [(n, labelin n, labelout n) | n <- ns]
+
     where
+
+    labelin :: Node a -> [b]
     labelin n = foldl union [] [labelout p | p <- pred es n]
+
+    labelout :: Node a -> [b]
     labelout n = union (gen g n) ((labelin n) \\ (kill g n))
+
+    pred :: [Edge a] -> Node a -> [Node a]
     pred [] _ = []
     pred ((Edge (src, dst)):es) n
         | n == dst = src : pred es n
