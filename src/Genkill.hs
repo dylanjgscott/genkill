@@ -10,6 +10,9 @@ data Node a  = Node a
 data Edge a  = Edge (Node a, Node a)
              deriving (Eq, Show)
 
+type Gen a b = Graph a -> Node a -> [b]
+type Kill a b = Graph a -> Node a -> [b]
+
 nodes = [Node "1y", Node "2x", Node "3z", Node "4x", Node "5x", Node "6"]
 edges = [ Edge (nodes!!0, nodes!!1),
     Edge (nodes!!1, nodes!!2),
@@ -19,23 +22,26 @@ edges = [ Edge (nodes!!0, nodes!!1),
     Edge (nodes!!4, nodes!!5) ]
 graph = Graph nodes edges
 
-gen :: Graph [Char] -> Node [Char] -> [Node [Char]]
+gen :: Gen String (Node String)
 gen g@(Graph ns es) n@(Node x) = if length x == 2 then [n] else []
 
-kill :: Graph [Char] -> Node [Char] -> [Node [Char]]
-kill g@(Graph ns es) n@(Node x) = if length x == 2 then overlapping (x!!1) (delete n ns) else []
-    where
-        overlapping :: Char -> [Node [Char]] -> [Node [Char]]
-        overlapping _ [] = []
-        overlapping c (n@(Node x):ns)
-            | length x == 2 && x!!1 == c = n : overlapping c ns
-            | otherwise = overlapping c ns
+kill :: Kill String (Node String)
+kill g@(Graph ns es) n@(Node x) =
+    if length x == 2
+    then overlapping (x!!1) (delete n ns)
+    else []
+        where
+            overlapping :: Char -> [Node [Char]] -> [Node [Char]]
+            overlapping _ [] = []
+            overlapping c (n@(Node x):ns)
+                | length x == 2 && x!!1 == c = n : overlapping c ns
+                | otherwise = overlapping c ns
 
 genkill
     :: (Eq a, Eq b)
     => Graph a
-    -> (Graph a -> Node a -> [b])
-    -> (Graph a -> Node a -> [b])
+    -> Gen a b
+    -> Kill a b
     -> [(Node a, [b], [b])]
 genkill g@(Graph ns es) gen kill = [(n, labelin n, labelout n) | n <- ns]
     where
