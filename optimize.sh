@@ -7,7 +7,11 @@
 #
 
 numArgs="$#"
-REGEX="-(?:([udl])(?!.*\1))(?:([udl])(?!.*\2))(?:([udl])(?!.*\3))"
+REGEX1="^-(?:([udl])(?!.*\1))(?:([udl])(?!.*\2))(?:([udl])(?!.*\3))$"
+
+REGEX2="^-(?:([udl])(?!.*\1))(?:([udl])(?!.*\2))$"
+
+REGEX3="^-(?:([udl])(?!.*\1))$"
 
 #If no args passed print manual
 if [ $numArgs -eq 0 ]; then
@@ -35,7 +39,7 @@ else
         if [ $numArgs -ge 2 ] && [ $numArgs -le 3 ]; then
 
             #Check optional args to see if they match allowed pattern or are empty
-            if [ -z $3 ] || echo $3 | grep -P -- $REGEX  ;  then
+            if [ -z $3 ] || echo $3 | grep -qP -- $REGEX1 || echo $3 | grep -qP -- $REGEX2 || echo $3 | grep -qP -- $REGEX3 ;  then
 
                 if [ -x optimizer ]; then
                 
