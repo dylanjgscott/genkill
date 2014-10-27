@@ -45,6 +45,11 @@ getBlockNumber (Block num _ ) = num
 getBlockInsts                :: Block -> [Instruction]
 getBlockInsts (Block _ inst) = inst
 
+
+-- Get the function and block position of a basic block
+getLabel    :: Node -> Label
+getLabel (Node {func = function, basic = block }) = (function, (getBlockNumber block))
+
 -- | Edge Level Helper Functions
 
 
@@ -73,18 +78,33 @@ getBlockInsts (Block _ inst) = inst
 
 -- | The main game. The CFG functions themselves 
 
--- Entry point to the module. Takes the provided graph and returns a graph
-buildMeAGraph          ::  Program -> Graph
-buildMeAGraph (f:fs)   = undefined
+---------------------------------------------------------------------------
+-- Entry point to the module. Takes the provided Program and returns a graph
+-- ------------------------------------------------------------------------
+buildMeAGraph           ::  Program -> Graph
+buildMeAGraph p         = buildEdgesAndGraph split_list
+        where
+            raw_list    = buildListOfBasicBlocks p
+            split_list  = buildListOfSplitBasicBlocks raw_list
+---------------------------------------------------------------------------            
 
 -- First pass of program. Build list of nodes as they are
-buildListOfBasicBlocks        :: Program -> [Node]
-buildListOfBasicBlocks (f:fs) = undefined
+buildListOfBasicBlocks          :: Program -> [Node]
+buildListOfBasicBlocks []       = []
+buildListOfBasicBlocks (f:fs)   = buildFuncNodes f ++ buildListOfBasicBlocks fs 
 
+-- Return a list of nodes in each function
+buildFuncNodes                          :: Function -> [Node]
+buildFuncNodes (Function name _ blocks) = buildBlocks name blocks
+
+-- Block level generation of Nodes representing Basic Blocks
+buildBlocks             :: String -> [Block] -> [Node]
+buildBlocks name []     = []
+buildBlocks name (b:bs) = [Node name b] ++ buildBlocks name bs
 
 -- Second pass. Take List of Nodes and split at function calls
-buildListOfSplitBasicBlocks          :: [Node] -> [Node]
-buildListOfSplitBasicBlocks (x:xs)   = undefined
+buildListOfSplitBasicBlocks     :: [Node] -> [Node]
+buildListOfSplitBasicBlocks n   = n
 
 -- Take a label and split that node into two.
 splitNode   ::  Node -> [Node]
@@ -108,7 +128,7 @@ incrBlockPos (Node {func = name, basic = block}) =
 
 -- Third pass. Take split blocks and generate edges - therefore - Graph
 buildEdgesAndGraph          :: [Node] -> Graph
-buildEdgesAndGraph (x:xs)   = undefined
+buildEdgesAndGraph nodes   = Graph nodes [] --empty list for testing  
 
 
 

@@ -7,7 +7,10 @@ import System.Console.GetOpt
 import Data.Char
 import Data.List
 
-
+import Parser
+import Lexer
+import Token
+import CFG
 
 
 
@@ -33,7 +36,16 @@ main = do
         then print "Remove redundant loads."
         else print "Leaving redundant loads."
 
-
+    
 
     print $ show filename
     print $ show options
+    
+
+    -- testing Graph generation
+    putStr "Attempting to Parse file..."
+    source <- readFile "tests/input/example.txt"
+    let prog = parse (alexScanTokens source)
+    print prog
+    putStr "Attempting to build a graph..."
+    print $ buildMeAGraph prog

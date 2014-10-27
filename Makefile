@@ -13,8 +13,8 @@ Lexer.hs: Lexer.x
 Parser.hs: Parser.y
 	$(PG) $<
 
-optimizer: Optimizer.hs
-	$(HC) --make -i -o $@ $< 
+optimizer: Optimizer.hs CFG.hs Parser.hs Lexer.hs
+	$(HC) --make -i$(SRCDIR) -o $@ $< 
 
 tester: Tester.hs optimizer CFG.hs CFGTests.hs TestLib.hs
 	$(HC) --make -i$(SRCDIR):$(TEST_SRC) -o $@ $<
