@@ -45,7 +45,7 @@ makeGraph bs = Graph nodes edges
     nodes :: [Node Block]
     nodes = map Node bs
     edges :: [Edge Block]
-    edges = foldr (++) (map blockEdges bs) []
+    edges = concat $ map blockEdges bs
 
     blockEdges :: Block -> [Edge Block]
     blockEdges b@(Block _ is) = map (\x -> Edge (Node b, Node x)) (blockLinks is)
