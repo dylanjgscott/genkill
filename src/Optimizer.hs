@@ -41,8 +41,8 @@ main = do
 getBlocks :: Function -> [Block]
 getBlocks (Function _ _ bs) = bs
 
--- Turns a single function into a graph
-makeGraph :: Function -> Graph Block
+-- Turns a list of blocks into a graph
+makeGraph :: [Block] -> Graph Block
 makeGraph bs = Graph nodes edges
     where
 
