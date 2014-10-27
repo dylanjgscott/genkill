@@ -104,7 +104,7 @@ buildBlocks name (b:bs) = [Node name b] ++ buildBlocks name bs
 
 -- Second pass. Take List of Nodes and split at function calls
 buildListOfSplitBasicBlocks     :: [Node] -> [Node]
-buildListOfSplitBasicBlocks n   = n
+buildListOfSplitBasicBlocks n   = n --for testing. Need to implement now...
 
 -- Take a label and split that node into two.
 splitNode   ::  Node -> [Node]

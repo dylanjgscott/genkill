@@ -43,9 +43,7 @@ main = do
     
 
     -- testing Graph generation
-    putStr "Attempting to Parse file..."
     source <- readFile "tests/input/example.txt"
     let prog = parse (alexScanTokens source)
-    print prog
     putStr "Attempting to build a graph..."
     print $ buildMeAGraph prog
