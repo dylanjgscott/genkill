@@ -52,8 +52,8 @@ makeGraph bs = Graph nodes edges
 
     blockLinks :: [Instruction] -> [Block]
     blockLinks [] = []
-    blockLinks (_:is) = blockLinks is
     blockLinks (Br _ id1 id2:is) = getBlock bs id1 : getBlock bs id2 : blockLinks is
+    blockLinks (_:is) = blockLinks is
 
 makeGraphs :: Program -> [Graph Block]
 makeGraphs = map (makeGraph . getBlocks)
