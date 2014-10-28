@@ -29,7 +29,7 @@ genkill cfg@(Cfg ns es) comb gen kill xs = [(x, (labelin n, labelout n)) | n@(Cf
     labelin :: CfgNode a -> [b]
     labelin n = foldl comb [] [labelout p | p <- pred es n]
 
-    -- Generates all the labels coming out out of a node.
+    -- Generates all the labels coming out of a node.
     labelout :: CfgNode a -> [b]
     labelout n@(CfgNode x) = comb (gen x) ((nub (labelin n)) \\ (kill x))
 

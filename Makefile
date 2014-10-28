@@ -13,7 +13,7 @@ Lexer.hs: Lexer.x
 Parser.hs: Parser.y
 	$(PG) $<
 
-optimizer: Optimizer.hs Cfg.hs Parser.hs Lexer.hs
+optimizer: Optimizer.hs Cfg.hs Deadcode.hs Unreachable.hs Parser.hs Lexer.hs
 	$(HC) --make -i$(SRCDIR) -o $@ $< 
 
 tester: Tester.hs optimizer Cfg.hs CFGTests.hs TestLib.hs
@@ -28,8 +28,12 @@ clean:
 	rm -f optimizer
 	rm -f $(SRCDIR)/Optimizer.hi
 	rm -f $(SRCDIR)/Optimizer.o
-	rm -f $(SRCDIR)/CFG.hi
-	rm -f $(SRCDIR)/CFG.o
+	rm -f $(SRCDIR)/Cfg.hi
+	rm -f $(SRCDIR)/Cfg.o
+	rm -f $(SRCDIR)/Unreachable.hi
+	rm -f $(SRCDIR)/Unreachable.o
+	rm -f $(SRCDIR)/Deadcode.hi
+	rm -f $(SRCDIR)/Deadcode.o
 	rm -f tester
 	rm -f $(TEST_SRC)/Tester.hi
 	rm -f $(TEST_SRC)/Tester.o

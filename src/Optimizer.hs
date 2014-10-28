@@ -11,27 +11,37 @@ import Lexer
 import Parser
 import Assembly
 import Deadcode
+import Unreachable
 
 main :: IO ()
 main = do
     [filename, options]    <- getArgs
 
-    if (isInfixOf "u" options)
-        then print "Remove unreachable code."   -- Run U
-        else print "Leaving unreachable code."
-
-    if (isInfixOf "d" options)
-        then print "Remove dead code."          -- Run dead
-        else print "Leaving dead loads."
-
-
-    if (isInfixOf "l" options)                  -- Run l
-        then print "Remove redundant loads."
-        else print "Leaving redundant loads."
-
     fileContents <- readFile filename
     
     let prog = parse . alexScanTokens $ fileContents
 
+
+    if (isInfixOf "u" options)
+        then 
+             --print "Remove unreachable code."  -- Run U
+             
+             -- Print the graphs for a whole program
+             
+             print . show . unreachable . getBlocks $ prog!!0
+        
+        else print "Leaving unreachable code."
+
+--    if (isInfixOf "d" options)
+--        then print "Remove dead code."          -- Run dead
+--        else print "Leaving dead loads."
+--
+--
+--    if (isInfixOf "l" options)                  -- Run l
+--        then print "Remove redundant loads."
+--        else print "Leaving redundant loads."
+--
+    
+
     -- Print the graphs for a whole program
-    print . show . deadcode . getBlocks $ prog!!0
+--    print . show . deadcode . getBlocks $ prog!!0
