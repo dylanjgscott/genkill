@@ -7,17 +7,10 @@ import System.Console.GetOpt
 import Data.Char
 import Data.List
 
-import Parser
 import Lexer
-import Token
-import CFG
-
-
-
-options :: [OptDescr a]
-options = []
-
-
+import Parser
+import Assembly
+import Deadcode
 
 main :: IO ()
 main = do
@@ -36,14 +29,9 @@ main = do
         then print "Remove redundant loads."
         else print "Leaving redundant loads."
 
+    fileContents <- readFile filename
     
+    let prog = parse . alexScanTokens $ fileContents
 
-    print $ show filename
-    print $ show options
-    
-
-    -- testing Graph generation
-    source <- readFile "tests/input/example.txt"
-    let prog = parse (alexScanTokens source)
-    putStr "Attempting to build a graph..."
-    print $ buildMeAGraph prog
+    -- Print the graphs for a whole program
+    print . show . deadcode . getBlocks $ prog!!0

@@ -13,15 +13,14 @@ Lexer.hs: Lexer.x
 Parser.hs: Parser.y
 	$(PG) $<
 
-optimizer: Optimizer.hs CFG.hs Parser.hs Lexer.hs
+optimizer: Optimizer.hs Cfg.hs Parser.hs Lexer.hs
 	$(HC) --make -i$(SRCDIR) -o $@ $< 
 
-tester: Tester.hs optimizer CFG.hs CFGTests.hs TestLib.hs
+tester: Tester.hs optimizer Cfg.hs CFGTests.hs TestLib.hs
 	$(HC) --make -i$(SRCDIR):$(TEST_SRC) -o $@ $<
     
 test: tester
 	./tester
-
                     
 clean:
 	rm -f $(SRCDIR)/Lexer.hs
@@ -38,5 +37,3 @@ clean:
 	rm -f $(TEST_SRC)/TestLib.o
 	rm -f $(TEST_SRC)/CFGTests.hi
 	rm -f $(TEST_SRC)/CFGTests.o
-
-
