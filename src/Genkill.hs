@@ -10,6 +10,7 @@ type MakeCfg a = [a] -> Cfg a
 type Comb b = [b] -> [b] -> [b]
 type Gen a b = a -> [b]
 type Kill a b = a -> [b]
+type GenKillOut a b = [(a, ([b], [b]))]
 
 -- Generate all the in and out labels for all the nodes in a graph.
 genkill
@@ -19,8 +20,8 @@ genkill
     -> Gen a b
     -> Kill a b
     -> [a]
-    -> [(a, [b], [b])]
-genkill cfg@(Cfg ns es) comb gen kill xs = [(x, labelin n, labelout n) | n@(CfgNode x) <- ns]
+    -> GenKillOut a b
+genkill cfg@(Cfg ns es) comb gen kill xs = [(x, (labelin n, labelout n)) | n@(CfgNode x) <- ns]
 
     where
 

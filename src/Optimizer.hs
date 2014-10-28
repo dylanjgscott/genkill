@@ -10,12 +10,7 @@ import Data.List
 import Lexer
 import Parser
 import Assembly
-import Cfg
-import Genkill
 import Deadcode
-
-options :: [OptDescr a]
-options = []
 
 main :: IO ()
 main = do
@@ -40,3 +35,4 @@ main = do
 
     -- Print the graphs for a whole program
     print . show . deadcode . getBlocks $ prog!!0
+
