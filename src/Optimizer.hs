@@ -10,7 +10,9 @@ import Data.List
 import Lexer
 import Parser
 import Assembly
+import Cfg
 import Genkill
+import Deadcode
 
 options :: [OptDescr a]
 options = []
@@ -33,43 +35,8 @@ main = do
         else print "Leaving redundant loads."
 
     fileContents <- readFile filename
+    
+    let prog = parse . alexScanTokens $ fileContents
 
     -- Print the graphs for a whole program
-    print . show . makeGraphs . parse . alexScanTokens $ fileContents
-
--- Get all the blocks in a function
-getBlocks :: Function -> [Block]
-getBlocks (Function _ _ bs) = bs
-
--- Turns a list of blocks into a graph
-makeGraph :: [Block] -> Graph Block
-makeGraph bs = Graph nodes edges
-    where
-
-    -- The nodes for the graph
-    nodes :: [Node Block]
-    nodes = map Node bs
-
-    -- The edges for the graph
-    edges :: [Edge Block]
-    edges = concat $ map blockEdges bs
-
-    -- Takes a block and returns all the directed edges for it
-    blockEdges :: Block -> [Edge Block]
-    blockEdges b@(Block _ is) = map (\x -> Edge (Node b, Node x)) (blockLinks is)
-
-    -- Return all the possible blocks a set of instructions can branch to
-    blockLinks :: [Instruction] -> [Block]
-    blockLinks [] = []
-    blockLinks (Br _ id1 id2:is) = getBlock bs id1 : getBlock bs id2 : blockLinks is
-    blockLinks (_:is) = blockLinks is
-
-
--- Make a graph for each function in a program
-makeGraphs :: Program -> [Graph Block]
-makeGraphs = map (makeGraph . getBlocks)
-
--- Find a block with a particular block id
-getBlock :: [Block] -> Assembly.Num -> Block
-getBlock [] _ = error "block doesn't exist"
-getBlock (b@(Block id _):bs) n = if id == n then b else getBlock bs n
+    print . show . deadcode . getBlocks $ prog!!0

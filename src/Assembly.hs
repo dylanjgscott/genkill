@@ -28,3 +28,12 @@ type Num = Integer
 type Reg = Integer
 
 type Id = String
+
+-- Get all the blocks in a function
+getBlocks :: Function -> [Block]
+getBlocks (Function _ _ bs) = bs
+
+-- Find a block with a particular block id
+lookupBlock :: [Block] -> Assembly.Num -> Block
+lookupBlock [] _ = error "block doesn't exist"
+lookupBlock (b@(Block id _):bs) n = if id == n then b else lookupBlock bs n
