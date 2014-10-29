@@ -13,6 +13,9 @@ import Assembly
 import Deadcode
 import Unreachable
 
+optArg :: String -> [String] -> Bool
+optArg opt args = opt `elem` init args
+
 main :: IO ()
 main = do
     args <- getArgs
@@ -23,15 +26,29 @@ main = do
     
     let prog = parse . alexScanTokens $ fileContents
 
-
-    if "-u" `elem` args then 
-             --print "Remove unreachable code."  -- Run U
-             
-             -- Print the graphs for a whole program
-             
+  
+--    let opts = concat [ [ "unreachable" | (optArg "-u" args) ],
+--                        [ "Dead Code"   | (optArg "-d" args) ],
+--                        [ "Loads"       | (optArg "-l" args) ]]
+--    
+--    if opts == [] then
+--            print "do all..." 
+--        else
+--            print "one select"
+    
+    
+    
+    if optArg "-u" args then 
              print . show . unreachable . getBlocks $ prog!!0
-        
-        else print "Leaving unreachable code."
+       else print "Leaving unreachable code."
+    if optArg "-l" args then 
+             print . show . unreachable . getBlocks $ prog!!0
+       else print "Not Removing deadcode."
+    if optArg "-l" args then 
+             print . show . unreachable . getBlocks $ prog!!0
+       else print "Not optimising loads."
+
+
 
 --    if (isInfixOf "d" options)
 --        then print "Remove dead code."          -- Run dead
@@ -46,3 +63,18 @@ main = do
 
     -- Print the graphs for a whole program
 --    print . show . deadcode . getBlocks $ prog!!0
+--
+opts args
+    | ut == False && dt == False && lt == False = getOpts True True True
+    | otherwise = getOpts ut dt lt
+    where
+        ut = optArg "-u" args
+        dt = optArg "-d" args
+        lt = optArg "-l" args
+
+
+getOpts u d l =  concat [   [ "unreachable" | u ],
+                            [ "Dead Code"   | d ],
+                            [ "Loads"       | l ]]
+    
+
