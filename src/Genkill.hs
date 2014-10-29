@@ -39,7 +39,7 @@ genkill cfg@(Cfg ns es) meet gen kill direction xs = [(x, (labelin n, labelout n
         | direction == Forwards = foldl meet [] [labelout p | p <- Cfg.pred es node]
         | direction == Backwards = trans node (labelout node)
 
-    -- Generates all the labels coming out out of a node.
+    -- Generates all the labels coming out of a node.
     labelout :: CfgNode a -> [b]
     labelout node@(CfgNode x)
         | direction == Forwards = trans node (labelin node)
