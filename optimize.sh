@@ -1,58 +1,84 @@
-#!/bin/bash
-#COMP3109 Assignment 3
-#Launcher for optimizer
-#Group Members:
-#   
-#
-#
+#!/bin/sh
 
-numArgs="$#"
-REGEX1="^-(?:([udl])(?!.*\1))(?:([udl])(?!.*\2))(?:([udl])(?!.*\3))$"
+OPTIND=1
 
-REGEX2="^-(?:([udl])(?!.*\1))(?:([udl])(?!.*\2))$"
+OPTIMIZER=./optimizer
 
-REGEX3="^-(?:([udl])(?!.*\1))$"
+DEAD=
+LOAD=
+UNREACHABLE=
+OUTFILE=
+INFILE=
 
-#If no args passed print manual
-if [ $numArgs -eq 0 ]; then
-    echo "\n"
-    echo "**************************************"
-    echo "Welcome to our COMP3109 Assignment 3" 
-    echo "Intermediate Language Optimizer tool"
-    echo "**************************************"
-    echo "usage: ./optimize.sh [input-file] [output-file] -[optional-args]"
-    echo "Available optional commands: "
-    echo "    u   Remove unreachable code."
-    echo "    d   Eliminate Dead code."
-    echo "    l   Eliminate redundant loads"
-    echo "Note: No optional arguments will result in all optimizations being run."
-    echo "Example: "
-    echo "\n"
-    echo "    ./optimize.sh myFile outputFile -ud"
-    echo "\n"
-    echo "Optimizer will remove unreachable and dead code from \"myFile\" and output result to \"outputFile\""
-    echo "\n"
-else
-    if [ $numArgs -lt 2 ] && [ $numArgs -gt 0 ]; then
-        echo "Only one argument passed to optimizer. Please supply at least 2: input and output files, or none to see help message."
-    else
-        if [ $numArgs -ge 2 ] && [ $numArgs -le 3 ]; then
+usage () {
+echo -e "Usage: optimize.sh [OPTION]... FILE"
+echo -e "\t-h\tThis help message."
+echo -e "\t-u\tTurn on unreachable code elimination"
+echo -e "\t-d\tTurn on dead code elimination."
+echo -e "\t-l\tTurn on load optimisations."
+echo -e "\t-o FILE\tWrite the output to FILE rather than stdout."
+}
 
-            #Check optional args to see if they match allowed pattern or are empty
-            if [ -z $3 ] || echo $3 | grep -qP -- $REGEX1 || echo $3 | grep -qP -- $REGEX2 || echo $3 | grep -qP -- $REGEX3 ;  then
+while getopts hudlo: opt; do
+	case "$opt" in
+	\?)
+		usage
+		exit -1
+		;;
+	h)
+		usage
+		exit 0
+		;;
+	u)
+		UNREACHABLE="-u"
+		;;
+	d)
+		DEAD="-d"
+		;;
+	l)
+		LOAD="-l"
+		;;
+	o)
+		FILE=$OPTARG
+	esac
+done
 
-                if [ -x optimizer ]; then
-                
-                    ./optimizer $1 $3 > $2
-                else
-                    echo "No optimizer executable found. Please run make and take a moment to consult the providecd README file."
-                fi
-            else
-                echo "Invalid optional arguments. Please run script without args to see help menu"
-            fi
-        else
-            echo "WHOA, too many arguments. Please consult the README file or run this script without arguments to see help message."
-        fi
-    fi
+shift $((OPTIND -1))
+
+INFILE=$@
+
+if [ ! -f $OPTIMIZER ]; then
+	echo -e "optimizer does not exist"
+	usage
+	exit -1
 fi
 
+if [ ! -x $OPTIMIZER ]; then
+	echo -e "optimizer not executable"
+	usage
+	exit -1
+fi
+
+if [ -z "$INFILE" ]; then
+	echo -e "no file provided"
+	usage
+	exit -1
+fi
+
+if [ ! -f $INFILE ]; then
+	echo -e "file does not exist"
+	usage
+	exit -1
+fi
+
+if [ ! -r $INFILE ]; then
+	echo -e "unable to read file"
+	usage
+	exit -1
+fi
+
+if [ -z "$OUTFILE" ]; then
+	./optimizer $UNREACHABLE $DEAD $LOAD $INFILE
+else
+	./optimizer $UNREACHABLE $DEAD $LOAD $INFILE > $OUTFILE
+fi
