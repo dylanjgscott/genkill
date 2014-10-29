@@ -13,6 +13,12 @@ import Assembly
 import Deadcode
 import Unreachable
 
+
+-- Apply a list of functions in sequence
+frobinate :: [a -> a] -> a -> a
+frobinate [] x = x
+frobinate (f:fs) x = frobinate fs (f x)
+
 optArg :: String -> [String] -> Bool
 optArg opt args = opt `elem` init args
 
@@ -49,5 +55,3 @@ opts args
 getOpts u d l =  concat [   [ "unreachable" | u ],
                             [ "Dead Code"   | d ],
                             [ "Loads"       | l ]]
-    
-
