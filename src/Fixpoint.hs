@@ -15,13 +15,14 @@ fixpoint f x
 
 helper :: forall a b . (Eq a, Eq b)
        => MakeCfg a
-       -> Comb b
+       -> Meet b
        -> Gen a b
        -> Kill a b
        -> Trans a b
+       -> Direction
        -> [a]
        -> [a]
-helper makeCfg comb gen kill trans x = trans (genkill' x) x
+helper makeCfg meet gen kill trans direction x
+    = trans (genkill cfg meet gen kill direction x) x
     where
-    genkill' = genkill cfg comb gen kill
-    cfg = makeCfg x
+        cfg = makeCfg x

@@ -6,8 +6,11 @@ import Data.List
 
 import Cfg
 
+data Direction = Forwards | Backwards
+               deriving Eq
+
 type MakeCfg a = [a] -> Cfg a
-type Comb b = [b] -> [b] -> [b]
+type Meet b = [b] -> [b] -> [b]
 type Gen a b = a -> [b]
 type Kill a b = a -> [b]
 type GenKillOut a b = [(a, ([b], [b]))]
@@ -16,26 +19,29 @@ type GenKillOut a b = [(a, ([b], [b]))]
 genkill
     :: forall a b . (Eq a, Eq b)
     => Cfg a
-    -> Comb b
+    -> Meet b
     -> Gen a b
     -> Kill a b
+    -> Direction
     -> [a]
     -> GenKillOut a b
-genkill cfg@(Cfg ns es) comb gen kill xs = [(x, (labelin n, labelout n)) | n@(CfgNode x) <- ns]
+genkill cfg@(Cfg ns es) meet gen kill direction xs = [(x, (labelin n, labelout n)) | n@(CfgNode x) <- ns]
 
     where
 
+    -- Transfer function.
+    trans :: CfgNode a -> [b] -> [b]
+    trans node@(CfgNode z) x = (gen z) `union` ((nub x) \\ (kill z))
+
     -- Generates all the labels coming in to a node.
     labelin :: CfgNode a -> [b]
-    labelin n = foldl comb [] [labelout p | p <- pred es n]
+    labelin node
+        | direction == Forwards = foldl meet [] [labelout p | p <- Cfg.pred es node]
+        | direction == Backwards = trans node (labelout node)
 
     -- Generates all the labels coming out out of a node.
     labelout :: CfgNode a -> [b]
-    labelout n@(CfgNode x) = comb (gen x) ((nub (labelin n)) \\ (kill x))
+    labelout node@(CfgNode x)
+        | direction == Forwards = trans node (labelin node)
+        | direction == Backwards = foldl meet [] [labelin s | s <- Cfg.succ es node]
 
-    -- Lists all the nodes with an edge ending at the given node.
-    pred :: [CfgEdge a] -> CfgNode a -> [CfgNode a]
-    pred [] _ = []
-    pred ((CfgEdge (src, dst)):es) n
-        | n == dst = src : pred es n
-        | otherwise = pred es n

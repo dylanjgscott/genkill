@@ -14,22 +14,7 @@ import Deadcode
 
 main :: IO ()
 main = do
-    [filename, options]    <- getArgs
-
-    if (isInfixOf "u" options)
-        then print "Remove unreachable code."   -- Run U
-        else print "Leaving unreachable code."
-
-    if (isInfixOf "d" options)
-        then print "Remove dead code."          -- Run dead
-        else print "Leaving dead loads."
-
-
-    if (isInfixOf "l" options)                  -- Run l
-        then print "Remove redundant loads."
-        else print "Leaving redundant loads."
-
-    fileContents <- readFile filename
+    fileContents <- readFile "../tests/input/deadcode2.txt"
     
     let prog = parse . alexScanTokens $ fileContents
 

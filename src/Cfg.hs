@@ -36,3 +36,17 @@ makeCfg bs = Cfg nodes edges
 -- Make a graph for each function in a program
 makeCfgList :: Program -> [Cfg Block]
 makeCfgList = map (makeCfg . getBlocks)
+
+-- Lists all the nodes with an edge ending at the given node.
+pred :: Eq a => [CfgEdge a] -> CfgNode a -> [CfgNode a]
+pred [] _ = []
+pred ((CfgEdge (src, dst)):es) node
+    | node == dst = src : Cfg.pred es node
+    | otherwise = Cfg.pred es node
+
+-- Lists all the nodes with an edge beginning at the given node.
+succ :: Eq a => [CfgEdge a] -> CfgNode a -> [CfgNode a]
+succ [] _ = []
+succ ((CfgEdge (src, dst)):es) node
+    | node == dst = src : Cfg.succ es node
+    | otherwise = Cfg.succ es node
