@@ -15,15 +15,16 @@ import Unreachable
 
 main :: IO ()
 main = do
-    [filename, options]    <- getArgs
+    args <- getArgs
+
+    let filename = last args
 
     fileContents <- readFile filename
     
     let prog = parse . alexScanTokens $ fileContents
 
 
-    if (isInfixOf "u" options)
-        then 
+    if "-u" `elem` args then 
              --print "Remove unreachable code."  -- Run U
              
              -- Print the graphs for a whole program
