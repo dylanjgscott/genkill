@@ -7,33 +7,21 @@ import Genkill
 import Assembly
 import Fixpoint
 
-unreachableGen :: Gen Block Reg
-unreachableGen (Block _ is) = allocatedRegs is
-    where
-    allocatedRegs :: [Instruction] -> [Reg]
-    allocatedRegs _ = []
+unreachableGen :: Gen Block Bool
+unreachableGen (Block num _) 
+    | num == 0 = [True]
+    | otherwise = []
 
+unreachableKill :: Kill Block Bool
+unreachableKill _ = []
 
-unreachableKill :: Kill Block Reg
-unreachableKill (Block _ is) = usedRegs is
-    where
-    usedRegs :: [Instruction] -> [Reg]
-    usedRegs [] = []
-    usedRegs (i:is) = let
-        reg = case i of
-            (Br r _ _) -> [r]
-            (Ret r) -> [r]
-            otherwise -> []
-        in
-            reg ++ usedRegs is
-
-unreachableTrans :: Trans Block Reg
+unreachableTrans :: Trans Block Bool
 unreachableTrans _ [] = []
 unreachableTrans (a:as) (b:bs) 
-    | fst (snd a) == [] && (getBlockNum b) /= 0 = unreachableTrans as bs
-    | otherwise = [b] ++ unreachableTrans as bs
- 
+    | labelsIn  == [] = unreachableTrans as bs
+    | otherwise = b : unreachableTrans as bs
+    where
+        labelsIn    = snd (snd a)
+
 unreachable = fixpoint (helper makeCfg union unreachableGen unreachableKill unreachableTrans)
 
-getBlockNum :: Block -> Integer
-getBlockNum (Block num _ ) = num
