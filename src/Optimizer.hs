@@ -6,21 +6,27 @@ import System.Exit
 import System.Console.GetOpt
 import Data.Char
 import Data.List
+import Data.Maybe
 
 import Lexer
 import Parser
 import Assembly
 import Deadcode
 import Unreachable
+import Fixpoint
 
 noop :: Program -> Program
 noop p = p
+
+frobinate :: [a -> a] -> a -> a
+frobinate [] x = x
+frobinate (f:fs) x = frobinate fs (f x)
 
 optimisationOptions :: [(String, Program -> Program)]
 optimisationOptions = [
         ("-u", unreachable),
         ("-d", deadcode),
-        ("-l", noop),
+        ("-l", noop)
     ]
 
 parseOptions :: [String] -> [Program -> Program]
@@ -38,3 +44,7 @@ main = do
     let program = parse . alexScanTokens $ fileContents
 
     let optimisations = parseOptions options
+
+    let optimizer = fixpoint (frobinate optimisations)
+
+    print . show $ optimizer program

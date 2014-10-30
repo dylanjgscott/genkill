@@ -4,6 +4,7 @@ module Fixpoint where
 
 import Cfg
 import Genkill
+import Assembly
 
 type Trans a b = GenKillOut a b -> [a] -> [a]
 
@@ -13,7 +14,7 @@ fixpoint f x
     | otherwise = fixpoint f (fx)
     where fx = f x
 
-helper :: forall a b . (Eq a, Eq b)
+applyTransformation :: forall a b . (Eq a, Eq b)
        => MakeCfg a
        -> Meet b
        -> Gen a b
@@ -22,7 +23,13 @@ helper :: forall a b . (Eq a, Eq b)
        -> Direction
        -> [a]
        -> [a]
-helper makeCfg meet gen kill trans direction x
+applyTransformation makeCfg meet gen kill trans direction x
     = trans (genkill cfg meet gen kill direction x) x
     where
         cfg = makeCfg x
+
+applyBlockTransform :: ([Block] -> [Block]) -> Program -> Program
+applyBlockTransform _ [] = []
+applyBlockTransform t ((Function id args blocks):fs) =
+    Function id args (t blocks) : applyBlockTransform t fs
+

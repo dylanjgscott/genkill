@@ -23,5 +23,7 @@ unreachableTrans (a:as) (b:bs)
     where
         labelsIn    = snd (snd a)
 
-unreachable = fixpoint (helper makeCfg union unreachableGen unreachableKill unreachableTrans Forwards)
+unreachableBlockTransform = fixpoint (applyTransformation makeCfg union unreachableGen unreachableKill unreachableTrans Forwards)
 
+unreachable :: Program -> Program
+unreachable p = applyBlockTransform unreachableBlockTransform p
