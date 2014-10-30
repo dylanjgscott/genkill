@@ -9,6 +9,7 @@ import Assembly
 import Util
 
 data LoadLabel = LoadLabel (Reg, Id)
+               deriving (Show)
 
 
 instance Eq LoadLabel where
@@ -36,10 +37,38 @@ kill ((blk, ln), instr) = case instr of
     (Call reg _ _) -> [LoadLabel (reg, "")]
     otherwise -> []
 
-redregTrans _ [] = []
-redregTrans _ inp = inp
 
-redreg = applyBlockTransform (fixpoint (runGenKill makeInstrCfg intersect gen kill redregTrans Forwards))
+
+
+redregTrans :: Transform Block InstrNode LoadLabel
+redregTrans _ [] = []
+redregTrans labels blocks = map (redregTrans' labels) blocks
+
+redregTrans' :: Labels InstrNode LoadLabel -> Block -> Block
+redregTrans' labels (Block blk instructs) =
+    let
+        transformed = map (redregTrans'' labels) (zip (zip [blk,blk..] [0..]) instructs)
+    in
+        Block blk transformed
+
+redregTrans'' :: Labels InstrNode LoadLabel -> InstrNode -> Instruction
+redregTrans'' labels n@(idf, instr) = 
+    let
+        -- We know that is must exist in labels, otherwise a node was not
+        -- properly generated in the graph, in which case failing hard
+        -- is acceptable as it indicates a serious logic error
+        (ins, outs) = fromJust (lookup n labels)
+
+        newInstr = if not (null ins) then (Ld 0 "changed") else instr
+        --newInstr = case instr of
+        --    ()
+    in
+        newInstr
+
+
+tmpkill cfg = genkill cfg union gen kill Forwards
+
+redreg = applyBlockTransform (fixpoint (runGenKill makeInstrCfg union gen kill redregTrans Forwards))
 
 -- loosely compared tuple
 

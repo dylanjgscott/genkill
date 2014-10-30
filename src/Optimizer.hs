@@ -15,6 +15,7 @@ import Deadcode
 import Unreachable
 import RedReg
 import Util
+import Cfg
 
 noop :: Program -> Program
 noop p = p
@@ -42,8 +43,9 @@ main = do
     let filename = last args
 
     fileContents <- readFile filename
+
     let program = parse . alexScanTokens $ fileContents
-    --putStr (show (makeCfg (getBlocks (program !! 0))))
+
     let optimisations = parseOptions options
 
     let optimizer = fixpoint (frobinate optimisations)
