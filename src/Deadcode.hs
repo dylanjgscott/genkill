@@ -44,7 +44,7 @@ definedRegs reg = case reg of
     otherwise -> []
 
 deadcodeTrans :: Transform Block Block Reg
-deadcodeTrans flowdata [] = []
+deadcodeTrans _ [] = []
 deadcodeTrans flowdata (b:bs) = deleteDeadcode b usedRegs : deadcodeTrans flowdata bs
     where
     usedRegs = fst . fromJust $ lookup b flowdata

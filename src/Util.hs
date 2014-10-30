@@ -5,7 +5,6 @@ import Genkill
 import Assembly
 import Data.List
 
-
 fixpoint :: Eq a => (a -> a) -> a -> a
 fixpoint f x
     | fx == x = x

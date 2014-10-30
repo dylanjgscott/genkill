@@ -12,6 +12,7 @@ import Lexer
 import Parser
 import Assembly
 import Deadcode
+import Deadstore
 import Unreachable
 import Util
 
@@ -25,7 +26,7 @@ frobinate (f:fs) x = frobinate fs (f x)
 optimisationOptions :: [(String, Program -> Program)]
 optimisationOptions = [
         ("-u", unreachable),
-        ("-d", deadcode),
+        ("-d", deadcode . deadstore),
         ("-l", noop)
     ]
 
