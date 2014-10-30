@@ -38,14 +38,14 @@ clean:
 	rm -f $(SRCDIR)/RedReg.o
 	rm -f $(SRCDIR)/Lexer.hi
 	rm -f $(SRCDIR)/Lexer.o
-	rm -r $(SRCDIR)/Parser.hi
-	rm -r $(SRCDIR)/Parser.o
-	rm -r $(SRCDIR)/Genkill.hi
-	rm -r $(SRCDIR)/Genkill.o
-	rm -r $(SRCDIR)/Assembly.hi
-	rm -r $(SRCDIR)/Assembly.o
-	rm -r $(SRCDIR)/Util.hi
-	rm -r $(SRCDIR)/Util.o
+	rm -f $(SRCDIR)/Parser.hi
+	rm -f $(SRCDIR)/Parser.o
+	rm -f $(SRCDIR)/Genkill.hi
+	rm -f $(SRCDIR)/Genkill.o
+	rm -f $(SRCDIR)/Assembly.hi
+	rm -f $(SRCDIR)/Assembly.o
+	rm -f $(SRCDIR)/Util.hi
+	rm -f $(SRCDIR)/Util.o
 	rm -f tester
 	rm -f $(TEST_SRC)/Tester.hi
 	rm -f $(TEST_SRC)/Tester.o
