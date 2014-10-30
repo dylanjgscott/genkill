@@ -39,7 +39,7 @@ while getopts hudlo: opt; do
 		LOAD="-l"
 		;;
 	o)
-		FILE=$OPTARG
+		OUTFILE=$OPTARG
 	esac
 done
 
