@@ -35,14 +35,21 @@ genkill (Cfg ns es) meet gen kill direction = [(x, (labelin n, labelout n)) | n@
     -- Generates all the labels coming in to a node.
     labelin :: CfgNode b -> [c]
     labelin node
-        | direction == Forwards = foldl meet [] [labelout p | p <- Cfg.pred es node]
         | direction == Backwards = trans node (labelout node)
+        | direction == Forwards = foldl meet first preds
+        where
+            first = if not (null preds) then preds !! 0 else []
+            preds = [labelout p | p <- Cfg.pred es node]
+        
 
     -- Generates all the labels coming out of a node.
     labelout :: CfgNode b -> [c]
-    labelout node@(CfgNode x)
+    labelout node
         | direction == Forwards = trans node (labelin node)
-        | direction == Backwards = foldl meet [] [labelin s | s <- Cfg.succ es node]
+        | direction == Backwards = foldl meet first succ
+        where
+            first = if not (null succ) then succ !! 0 else []
+            succ  = [labelin s | s <- Cfg.succ es node]
 
 runGenKill :: forall a b c . (Eq b, Eq c)
        => MakeCfg a b
