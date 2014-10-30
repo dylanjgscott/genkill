@@ -6,7 +6,7 @@ import Data.Maybe
 import Cfg
 import Genkill
 import Assembly
-import Fixpoint
+import Util
 
 use :: Gen Block Reg
 use (Block _ is) = foldl union [] (map usedRegs is)
@@ -43,7 +43,7 @@ definedRegs reg = case reg of
     (Call r _ _) -> [r]
     otherwise -> []
 
-deadcodeTrans :: Trans Block Reg
+deadcodeTrans :: Transform Block Reg
 deadcodeTrans flowdata [] = []
 deadcodeTrans flowdata (b:bs) = deleteDeadcode b usedRegs : deadcodeTrans flowdata bs
     where
@@ -58,7 +58,7 @@ deleteDeadcode (Block num ins) liveRegs = Block num liveIns
     isAlive i = (definedRegs i) \\ liveRegs == []
         
 deadcodeBlockTransform :: [Block] -> [Block]
-deadcodeBlockTransform = fixpoint (applyTransformation makeCfg union use def deadcodeTrans Backwards)
+deadcodeBlockTransform = fixpoint (runGenKill makeCfg union use def deadcodeTrans Backwards)
 
 deadcode :: Program -> Program
 deadcode p = applyBlockTransform deadcodeBlockTransform p

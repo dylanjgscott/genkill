@@ -14,6 +14,7 @@ type Meet b = [b] -> [b] -> [b]
 type Gen a b = a -> [b]
 type Kill a b = a -> [b]
 type GenKillOut a b = [(a, ([b], [b]))]
+type Transform a b = GenKillOut a b -> [a] -> [a]
 
 -- Generate all the in and out labels for all the nodes in a graph.
 genkill
@@ -45,3 +46,16 @@ genkill cfg@(Cfg ns es) meet gen kill direction xs = [(x, (labelin n, labelout n
         | direction == Forwards = trans node (labelin node)
         | direction == Backwards = foldl meet [] [labelin s | s <- Cfg.succ es node]
 
+runGenKill :: forall a b . (Eq a, Eq b)
+       => MakeCfg a
+       -> Meet b
+       -> Gen a b
+       -> Kill a b
+       -> Transform a b
+       -> Direction
+       -> [a]
+       -> [a]
+runGenKill makeCfg meet gen kill trans direction x
+    = trans (genkill cfg meet gen kill direction x) x
+    where
+        cfg = makeCfg x

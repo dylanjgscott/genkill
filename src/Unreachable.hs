@@ -5,7 +5,7 @@ import Data.List
 import Cfg
 import Genkill
 import Assembly
-import Fixpoint
+import Util
 
 unreachableGen :: Gen Block Bool
 unreachableGen (Block num _) 
@@ -15,7 +15,7 @@ unreachableGen (Block num _)
 unreachableKill :: Kill Block Bool
 unreachableKill _ = []
 
-unreachableTrans :: Trans Block Bool
+unreachableTrans :: Transform Block Bool
 unreachableTrans _ [] = []
 unreachableTrans (a:as) (b:bs) 
     | labelsIn  == [] = unreachableTrans as bs
@@ -23,7 +23,7 @@ unreachableTrans (a:as) (b:bs)
     where
         labelsIn    = snd (snd a)
 
-unreachableBlockTransform = fixpoint (applyTransformation makeCfg union unreachableGen unreachableKill unreachableTrans Forwards)
+unreachableBlockTransform = fixpoint (runGenKill makeCfg union unreachableGen unreachableKill unreachableTrans Forwards)
 
 unreachable :: Program -> Program
 unreachable p = applyBlockTransform unreachableBlockTransform p

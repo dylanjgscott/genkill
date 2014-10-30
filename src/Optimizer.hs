@@ -13,7 +13,7 @@ import Parser
 import Assembly
 import Deadcode
 import Unreachable
-import Fixpoint
+import Util
 
 noop :: Program -> Program
 noop p = p
