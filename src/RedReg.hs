@@ -1,6 +1,7 @@
 module RedReg where 
 
 import Data.List
+import Data.Maybe
 
 import Cfg
 import Genkill
@@ -13,10 +14,33 @@ import Fixpoint
 
 -- reg2 is eliminated
 
-makeCFG
+-- Turns a list of blocks into a graph
+makeCfg :: [Block] -> Cfg (Int, (Int, Instruction))
+makeCfg bs = 
+    let
+        blockToNodes (Block id instructs) = map (\x -> CfgNode x) . zip (zip [id,id..] [0..]) instructs
+        blocksToNodes = foldl (++ . blockToNodes) []
+        nodes = blocksToNodes bs
 
-gen :: Gen Instruction [(Istruction, Integer)]
+        successors (CfgNode x) = successors' x
 
-kill :: Gen 
 
-redreg = fixpoint (runGenKill )
+        successors' ((blk, ln), (Br _ blk1 blk2)) = successors'' (blk, ln + 1) 
+                                                 ++ successors'' (blk1, 0) 
+                                                 ++ successors'' (blk2, 0)
+        successors' ((blk, ln), _) = successors'' (blk, ln + 1)
+
+
+        successors'' idf = map isJust (find (\(CfgNode x) -> fst x == idf) nodes)
+
+        nodeToEdges node = map (\x -> CfgEdge) (zip [node,node..] (successors node))
+
+        edges = foldl (++ . nodeToEdges)  [] nodes
+
+--gen :: Gen Instruction [(Istruction, Integer)]
+
+--kill :: Gen Instruction
+
+--redreg = fixpoint (runGenKill )
+
+---- makeCfg meet gen kill trans direction x
