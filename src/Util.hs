@@ -1,26 +1,10 @@
-{-# LANGUAGE ScopedTypeVariables #-}
-
-module Fixpoint where
+module Util where
 
 import Cfg
 import Genkill
 import Assembly
 import Data.List
 
--- | Types for Pretty Program 
---type ExeProgram = [Function]
---type ExeFunction = (Id, [Id], [Block])
---type ExeBlock = Block
---type ExeInstruction = [String]
---type ExeId = String
---type ExeBlockId = Int
---type ExeRegister = Int
-
-
-
-
-
-type Trans a b = GenKillOut a b -> [a] -> [a]
 
 fixpoint :: Eq a => (a -> a) -> a -> a
 fixpoint f x
@@ -28,24 +12,11 @@ fixpoint f x
     | otherwise = fixpoint f (fx)
     where fx = f x
 
-applyTransformation :: forall a b . (Eq a, Eq b)
-       => MakeCfg a
-       -> Meet b
-       -> Gen a b
-       -> Kill a b
-       -> Trans a b
-       -> Direction
-       -> [a]
-       -> [a]
-applyTransformation makeCfg meet gen kill trans direction x
-    = trans (genkill cfg meet gen kill direction x) x
-    where
-        cfg = makeCfg x
-
 applyBlockTransform :: ([Block] -> [Block]) -> Program -> Program
 applyBlockTransform _ [] = []
 applyBlockTransform t ((Function id args blocks):fs) =
     Function id args (t blocks) : applyBlockTransform t fs
+
 
 -- Pretty printing functions, simple traversal of data structure
 -- Fairly self explanatory
