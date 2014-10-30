@@ -7,13 +7,13 @@ HC=ghc
 
 all: Lexer.hs Parser.hs optimizer
 
-Lexer.hs: Lexer.x
+Lexer.hs: Lexer.x Token.hs
 	$(LG) $<
 
-Parser.hs: Parser.y
+Parser.hs: Parser.y Token.hs
 	$(PG) $<
 
-optimizer: Optimizer.hs Cfg.hs Deadcode.hs Unreachable.hs Parser.hs Lexer.hs Deadstore.hs
+optimizer: Optimizer.hs Cfg.hs Deadcode.hs Unreachable.hs RedReg.hs Parser.hs Lexer.hs Genkill.hs Assembly.hs Util.hs Deadstore.hs
 	$(HC) --make -i$(SRCDIR) -o $@ $< 
 
 tester: Tester.hs optimizer Cfg.hs CFGTests.hs TestLib.hs
@@ -36,6 +36,18 @@ clean:
 	rm -f $(SRCDIR)/Deadcode.o
 	rm -f $(SRCDIR)/Deadstore.hi
 	rm -f $(SRCDIR)/Deadstore.o
+	rm -f $(SRCDIR)/RedReg.hi
+	rm -f $(SRCDIR)/RedReg.o
+	rm -f $(SRCDIR)/Lexer.hi
+	rm -f $(SRCDIR)/Lexer.o
+	rm -f $(SRCDIR)/Parser.hi
+	rm -f $(SRCDIR)/Parser.o
+	rm -f $(SRCDIR)/Genkill.hi
+	rm -f $(SRCDIR)/Genkill.o
+	rm -f $(SRCDIR)/Assembly.hi
+	rm -f $(SRCDIR)/Assembly.o
+	rm -f $(SRCDIR)/Util.hi
+	rm -f $(SRCDIR)/Util.o
 	rm -f tester
 	rm -f $(TEST_SRC)/Tester.hi
 	rm -f $(TEST_SRC)/Tester.o

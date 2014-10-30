@@ -58,7 +58,7 @@ deleteDeadcode (Block num ins) liveRegs = Block num liveIns
     isAlive i = (definedRegs i) \\ liveRegs == []
         
 deadcodeBlockTransform :: [Block] -> [Block]
-deadcodeBlockTransform = fixpoint (runGenKill makeCfg union use def deadcodeTrans Backwards)
+deadcodeBlockTransform = fixpoint (runGenKill makeBlockCfg union use def deadcodeTrans Backwards)
 
 deadcode :: Program -> Program
 deadcode p = applyBlockTransform deadcodeBlockTransform p

@@ -14,7 +14,9 @@ import Assembly
 import Deadcode
 import Deadstore
 import Unreachable
+import RedReg
 import Util
+import Cfg
 
 noop :: Program -> Program
 noop p = p
@@ -27,7 +29,7 @@ optimisationOptions :: [(String, Program -> Program)]
 optimisationOptions = [
         ("-u", unreachable),
         ("-d", deadcode . deadstore),
-        ("-l", noop)
+        ("-l", redreg)
     ]
 
 parseOptions :: [String] -> [Program -> Program]
@@ -42,6 +44,7 @@ main = do
     let filename = last args
 
     fileContents <- readFile filename
+
     let program = parse . alexScanTokens $ fileContents
 
     let optimisations = parseOptions options
