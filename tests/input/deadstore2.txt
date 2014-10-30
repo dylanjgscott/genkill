@@ -1,0 +1,10 @@
+((main  (n)
+	(0
+	(ld r1 n)
+	(lc r2 1)
+	(add r3 r2 r2)
+	(st xyzzy r3)
+	(ld r4 xyzzy)
+	(add r5 r4 r4)
+        (ret r1)
+)))
