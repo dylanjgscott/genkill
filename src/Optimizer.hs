@@ -47,4 +47,4 @@ main = do
 
     let optimizer = fixpoint (frobinate optimisations)
 
-    print . show $ optimizer program
+    putStr . showProgram $ optimizer program
