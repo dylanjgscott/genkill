@@ -5,6 +5,20 @@ module Fixpoint where
 import Cfg
 import Genkill
 import Assembly
+import Data.List
+
+-- | Types for Pretty Program 
+--type ExeProgram = [Function]
+--type ExeFunction = (Id, [Id], [Block])
+--type ExeBlock = Block
+--type ExeInstruction = [String]
+--type ExeId = String
+--type ExeBlockId = Int
+--type ExeRegister = Int
+
+
+
+
 
 type Trans a b = GenKillOut a b -> [a] -> [a]
 
@@ -33,3 +47,39 @@ applyBlockTransform _ [] = []
 applyBlockTransform t ((Function id args blocks):fs) =
     Function id args (t blocks) : applyBlockTransform t fs
 
+-- Pretty printing functions, simple traversal of data structure
+-- Fairly self explanatory
+showProgram :: Program -> String
+showProgram prog =  "( "
+                 ++ intercalate "\n  " (map showFunction prog)
+                 ++ " )\n"
+
+showFunction :: Function -> String
+showFunction (Function name args blocks) =  "("
+                  ++ name
+                  ++ " "
+                  ++ showArgs args
+                  ++ "\n    "
+                  ++ showBlocks blocks
+                  ++ " )"
+
+showArgs :: [Id] -> String
+showArgs args =  "("
+              ++ intercalate " " args
+              ++ ")"
+
+showBlocks :: [Block] -> String
+showBlocks blocks = intercalate "\n    " (map showBlock blocks)
+
+showBlock :: Block -> String
+showBlock (Block blkId instructs) =  "( "
+                            ++ show blkId
+                            ++ " "
+                            ++ intercalate "\n        " (map showInstruct instructs)
+                            ++ " )"
+
+showInstruct        :: Instruction -> String
+showInstruct instruct = "(" ++ show instruct ++ ")"
+
+showReg :: Reg -> String
+showReg reg = "r" ++ show reg

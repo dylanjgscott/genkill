@@ -1,5 +1,7 @@
 module Assembly where
 
+import Data.List
+
 type Program = [Function]
 
 data Function = Function Assembly.Id [Assembly.Id] [Block]
@@ -21,8 +23,23 @@ data Instruction = Lc Assembly.Reg Assembly.Num
                  | Br Assembly.Reg Assembly.Num Assembly.Num
                  | Ret Assembly.Reg
                  | Call Assembly.Reg Assembly.Id [Assembly.Reg]
-                 deriving (Show, Eq)
+                 deriving (Eq)
 
+instance Show Instruction where
+    show (Lc a b)   = "lc " ++  "r" ++ show  a ++ " "  ++ show b
+    show (Ld a b)   = "ld " ++  "r" ++ show  a ++ " "  ++ b
+    show (St a b)   = "st " ++  a ++ " "  ++ "r" ++ show b
+    show (Add a b c)   = "add " ++  "r" ++ show  a ++ " " ++ "r" ++ show b ++ " " ++ "r" ++ show c
+    show (Sub a b c)   = "sub " ++  "r" ++ show  a ++ " " ++ "r" ++ show b ++ " " ++ "r" ++ show c
+    show (Mul a b c)   = "mul " ++  "r" ++ show  a ++ " " ++ "r" ++ show b ++ " " ++ "r" ++ show c
+    show (Div a b c)   = "div " ++  "r" ++ show  a ++ " " ++ "r" ++ show b ++ " " ++ "r" ++ show c
+    show (Lt a b c)   = "lt " ++  "r" ++ show  a ++ " " ++ "r" ++ show b ++ " " ++ "r" ++ show c
+    show (Gt a b c)   = "gt " ++  "r" ++ show  a ++ " " ++ "r" ++ show b ++ " " ++ "r" ++ show c
+    show (Eq a b c)   = "eq " ++  "r" ++ show  a ++ " " ++ "r" ++ show b ++ " " ++ "r" ++ show c
+    show (Br a b c)   = "br " ++  "r" ++ show  a ++ " " ++ show b ++ " " ++ show c
+    show (Ret a)    = "ret " ++ "r" ++ show a
+    show (Call a b c)   = "call " ++  "r" ++ show  a ++ " " ++ b ++ " " ++ intercalate " " (map (("r" ++) . show) c)
+   
 type Num = Integer
 
 type Reg = Integer
