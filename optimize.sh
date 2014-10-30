@@ -20,7 +20,7 @@ echo -e "\t-o FILE\tWrite the output to FILE rather than stdout."
 }
 
 while getopts hudlo: opt; do
-	case "$opt" in
+	case $opt in
 	\?)
 		usage
 		exit -1
@@ -47,37 +47,31 @@ shift $((OPTIND -1))
 
 INFILE=$@
 
-if [ ! -f $OPTIMIZER ]; then
-	echo -e "optimizer does not exist"
+if [ ! -f $OPTIMIZER ] || [ ! -x $OPTIMIZER ]; then
+	echo -e "could not run the optimizer"
 	usage
 	exit -1
 fi
 
-if [ ! -x $OPTIMIZER ]; then
-	echo -e "optimizer not executable"
+if [ -z $INFILE ]; then
+	echo -e "no file specified"
 	usage
 	exit -1
 fi
 
-if [ -z "$INFILE" ]; then
-	echo -e "no file provided"
+if [ ! -f $INFILE ] || [ ! -r $INFILE ]; then
+	echo -e "unable to open file"
 	usage
 	exit -1
 fi
 
-if [ ! -f $INFILE ]; then
-	echo -e "file does not exist"
-	usage
-	exit -1
+if [ -z $UNREACHABLE ] && [ -z $DEAD ] && [ -z $LOAD ]; then
+	DEAD="-d"
+	LOAD="-l"
+	UNREACHABLE="-u"
 fi
 
-if [ ! -r $INFILE ]; then
-	echo -e "unable to read file"
-	usage
-	exit -1
-fi
-
-if [ -z "$OUTFILE" ]; then
+if [ -z $OUTFILE ]; then
 	./optimizer $UNREACHABLE $DEAD $LOAD $INFILE
 else
 	./optimizer $UNREACHABLE $DEAD $LOAD $INFILE > $OUTFILE
