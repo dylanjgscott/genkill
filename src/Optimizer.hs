@@ -13,6 +13,7 @@ import Parser
 import Assembly
 import Deadcode
 import Unreachable
+import RedReg
 import Util
 
 noop :: Program -> Program
@@ -26,7 +27,7 @@ optimisationOptions :: [(String, Program -> Program)]
 optimisationOptions = [
         ("-u", unreachable),
         ("-d", deadcode),
-        ("-l", noop)
+        ("-l", redreg)
     ]
 
 parseOptions :: [String] -> [Program -> Program]
@@ -42,7 +43,7 @@ main = do
 
     fileContents <- readFile filename
     let program = parse . alexScanTokens $ fileContents
-
+    --putStr (show (makeCfg (getBlocks (program !! 0))))
     let optimisations = parseOptions options
 
     let optimizer = fixpoint (frobinate optimisations)

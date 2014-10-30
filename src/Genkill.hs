@@ -9,7 +9,6 @@ import Cfg
 data Direction = Forwards | Backwards
                deriving Eq
 
-type MakeCfg a b = [a] -> Cfg b
 type Meet c = [c] -> [c] -> [c]
 type Gen b c = b -> [c]
 type Kill b c = b -> [c]
