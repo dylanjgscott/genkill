@@ -15,7 +15,7 @@ unreachableGen (Block num _)
 unreachableKill :: Kill Block Bool
 unreachableKill _ = []
 
-unreachableTrans :: Transform Block Bool
+unreachableTrans :: Transform Block Block Bool
 unreachableTrans _ [] = []
 unreachableTrans (a:as) (b:bs) 
     | labelsIn  == [] = unreachableTrans as bs

@@ -43,7 +43,7 @@ definedRegs reg = case reg of
     (Call r _ _) -> [r]
     otherwise -> []
 
-deadcodeTrans :: Transform Block Reg
+deadcodeTrans :: Transform Block Block Reg
 deadcodeTrans flowdata [] = []
 deadcodeTrans flowdata (b:bs) = deleteDeadcode b usedRegs : deadcodeTrans flowdata bs
     where
