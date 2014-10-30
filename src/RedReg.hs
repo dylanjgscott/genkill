@@ -8,7 +8,11 @@ import Genkill
 import Assembly
 import Util
 
-data LoadLabel a b = LoadLabel (a, b)
+data LoadLabel = LoadLabel (Reg, Id)
+
+
+instance Eq LoadLabel where
+    (LoadLabel (x,y)) == (LoadLabel (a,b)) = (x == a || y == b)
 
 -- [(val, reg1)]
 
@@ -16,33 +20,26 @@ data LoadLabel a b = LoadLabel (a, b)
 
 -- reg2 is eliminated
 
--- Turns a list of blocks into a graph
-makeCfg :: [Block] -> Cfg ((Integer, Integer), Instruction)
-makeCfg bs = 
-    let
-        blockToNodes (Block id instructs) = map (\x -> CfgNode x)  (zip (zip [id,id..] [0..]) instructs)
-        blocksToNodes = foldl (\x y -> x ++ (blockToNodes y)) []
-        nodes = blocksToNodes bs
+gen :: Gen InstrNode LoadLabel
+gen ((blk, ln), instr) = case instr of
+    (Ld reg idf) -> [LoadLabel (reg, idf)]
+    (Lc reg cons) -> [LoadLabel(reg, show cons)]
+    otherwise -> []
 
-        infNode node = node : infNode node
+kill :: Gen InstrNode LoadLabel
+kill ((blk, ln), instr) = case instr of
+    (St idf reg) -> [LoadLabel (reg, idf)]
+    (Add reg _ _) -> [LoadLabel (reg, "")]
+    (Sub reg _ _) -> [LoadLabel (reg, "")]
+    (Mul reg _ _) -> [LoadLabel (reg, "")]
+    (Div reg _ _) -> [LoadLabel (reg, "")]
+    (Call reg _ _) -> [LoadLabel (reg, "")]
+    otherwise -> []
 
-        successors (CfgNode x) = successors' x
+redregTrans _ [] = []
+redregTrans _ inp = inp
 
-
-        successors' ((blk, ln), (Br _ blk1 blk2)) = getNodes (blk, ln + 1) 
-                                                 ++ getNodes (blk1, 0)
-                                                 ++ getNodes (blk2, 0)
-        successors' ((blk, ln), _) = getNodes (blk, ln + 1)
-
-
-        getNodes idf = filter (\(CfgNode x) -> fst x == idf) nodes
-
-        nodeToEdges node = map (\x -> CfgEdge x) (zip (infNode node) (successors node))
-
-        edges = foldl (\x y -> x ++ (nodeToEdges y))  [] nodes
-    in
-    Cfg nodes edges
-
+redreg = applyBlockTransform (fixpoint (runGenKill makeInstrCfg intersect gen kill redregTrans Forwards))
 
 -- loosely compared tuple
 
