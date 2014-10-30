@@ -40,7 +40,7 @@ type InstrNode = ((Integer, Integer), Instruction)
 makeInstrCfg :: [Block] -> Cfg InstrNode
 makeInstrCfg bs = 
     let
-        blockToNodes (Block id instructs) = map (\x -> CfgNode x)  (zip (zip [id,id..] [0..]) instructs)
+        blockToNodes (Block blk instructs) = map (\x -> CfgNode x)  (zip (zip [blk,blk..] [0..]) instructs)
         blocksToNodes = foldl (\x y -> x ++ (blockToNodes y)) []
         nodes = blocksToNodes bs
 
