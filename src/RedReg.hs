@@ -8,6 +8,8 @@ import Genkill
 import Assembly
 import Util
 
+data LoadLabel a b = LoadLabel (a, b)
+
 -- [(val, reg1)]
 
 -- [(reg2, reg1)]
@@ -40,6 +42,12 @@ makeCfg bs =
         edges = foldl (\x y -> x ++ (nodeToEdges y))  [] nodes
     in
     Cfg nodes edges
+
+
+-- loosely compared tuple
+
+-- (a,b) == (a,c)
+-- (a,b) == (c,b)
 
 --gen :: Gen Instruction [(Istruction, Integer)]
 
