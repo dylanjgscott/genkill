@@ -28,7 +28,7 @@ pred ((CfgEdge (src, dst)):es) node
 succ :: Eq a => [CfgEdge a] -> CfgNode a -> [CfgNode a]
 succ [] _ = []
 succ ((CfgEdge (src, dst)):es) node
-    | node == dst = src : Cfg.succ es node
+    | node == src = dst : Cfg.succ es node
     | otherwise = Cfg.succ es node
 
 
