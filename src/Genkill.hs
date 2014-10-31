@@ -58,6 +58,7 @@ genkill (Cfg ns es) meet gen kill direction = [(x, (labelin n, labelout n)) | n@
             first = if not (null succ) then succ !! 0 else []
             succ  = [labelin s | s <- Cfg.succ es node]
 
+-- Build a graph, generate flow data and run a transformation function
 runGenKill :: forall a b c . (Eq b, Eq c, Show c, Show b)
        => MakeCfg a b
        -> Meet c

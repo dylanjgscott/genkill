@@ -8,38 +8,55 @@ import Genkill
 import Assembly
 import Util
 
-use :: Gen Block Id
-use (Block _ is) = foldl union [] (map usedVars is)
-
-def :: Kill Block Id
-def (Block _ is) = foldl union [] (map definedVars is)
-
-usedVars :: Instruction -> [Id]
-usedVars reg = case reg of
+-- Return a list of all the variables used by an instruction
+use :: InstrNode -> [Id]
+use ((_, _), instr) = case instr of
     (Ld _ x) -> [x]
     otherwise -> []
 
-definedVars :: Instruction -> [Id]
-definedVars reg = case reg of
+-- Return a list of all the variables defined by an instruction
+def :: InstrNode -> [Id]
+def ((_, _), instr) = case instr of
     (St x _) -> [x]
     otherwise -> []
 
-deadstoreTrans :: Transform Block Block Id
-deadstoreTrans _ [] = []
-deadstoreTrans flowdata (b:bs) = deleteDeadstore b usedVars : deadstoreTrans flowdata bs
-    where
-    usedVars = fst . fromJust $ lookup b flowdata
+-- Remove dead code from a list of blocks
+deadstoreTrans :: Transform Block InstrNode Id
+deadstoreTrans flowdata blocks = map (removeDeadstore flowdata) blocks
 
-deleteDeadstore :: Block -> [Id] -> Block
-deleteDeadstore (Block num ins) liveVars = Block num liveIns
+-- Remove dead code from a single block
+removeDeadstore :: Labels InstrNode Id -> Block -> Block
+removeDeadstore flowdata (Block bknum instrs) = Block bknum liveInstrs
     where
-    liveIns :: [Instruction]
-    liveIns = filter isAlive ins
-    isAlive :: Instruction -> Bool
-    isAlive i = (definedVars i) \\ liveVars == []
-        
+
+    -- List of live instructions in this block
+    liveInstrs :: [Instruction]
+    liveInstrs = map unpackInstr (filter isLive packedInstrs)
+
+    -- List of dead registers during the execution of an instruction
+    liveRegs :: InstrNode -> [Id]
+    liveRegs x = snd . fromJust $ lookup x flowdata
+
+    -- Returns true only if an instruction is live
+    isLive :: InstrNode -> Bool
+    isLive instr 
+        | def instr == [] = True
+        | all (\x -> x `notElem` (liveRegs instr)) (def instr) = False
+        | otherwise = True
+
+    -- Unpack an instruction from the graph type
+    unpackInstr :: InstrNode -> Instruction 
+    unpackInstr ((_, _), i) = i
+
+    -- A list of packed instructions to match the graph exactly
+    packedInstrs :: [InstrNode]
+    packedInstrs = zip (zip [bknum,bknum..] [0..]) instrs
+
+
+-- Apply the dead store instruction removal framework using fixpoint
 deadstoreBlockTransform :: [Block] -> [Block]
-deadstoreBlockTransform = fixpoint (runGenKill makeBlockCfg union use def deadstoreTrans Backwards)
+deadstoreBlockTransform = fixpoint (runGenKill makeInstrCfg union use def deadstoreTrans Backwards)
 
+-- Apply the dead store instruction removal to each function in a program
 deadstore :: Program -> Program
-deadstore p = applyBlockTransform deadstoreBlockTransform p
+deadstore = applyBlockTransform deadstoreBlockTransform
