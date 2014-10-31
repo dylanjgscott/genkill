@@ -28,9 +28,16 @@ genkill (Cfg ns es) meet gen kill direction = [(x, (labelin n, labelout n)) | n@
 
     where
 
+    -- This list different returns the first list, where every element
+    -- does not occur in the second list
+    diff [] _ = []
+    diff (x:xs) ys =
+      if elem x ys 
+      then diff xs ys
+      else x:(diff xs ys)
     -- Transfer function.
     trans :: CfgNode b -> [c] -> [c]
-    trans node@(CfgNode z) x = (gen z) `union` ((nub x) \\ (kill z))
+    trans node@(CfgNode z) x = (gen z) `union` (diff (nub x) (kill z))
 
     -- Generates all the labels coming in to a node.
     labelin :: CfgNode b -> [c]

@@ -12,24 +12,29 @@ data LoadLabel = LoadLabel (Reg, Id)
                deriving (Show)
 
 
+xor :: Bool -> Bool -> Bool
+xor x y = (x || y) && (not (x && y))
+
 instance Eq LoadLabel where
-    (LoadLabel (x,y)) == (LoadLabel (a,b)) = (x == a) -- && y == b)
+    (LoadLabel (x,y)) == (LoadLabel (a,b)) = 
+        ((x == a) && (y == b))
+        || ((x == a) && ( (y == "") || (b == "")))
+        || (((x == 0 ) || (a == 0)) && (y == b)) 
 
--- [(val, reg1)]
 
--- [(reg2, reg1)]
-
--- reg2 is eliminated
 
 gen :: Gen InstrNode LoadLabel
 gen ((blk, ln), instr) = case instr of
     (Ld reg idf) -> [LoadLabel (reg, idf)]
     (Lc reg cons) -> [LoadLabel(reg, show cons)]
+    (St idf reg) -> [LoadLabel (reg, idf)]
     otherwise -> []
 
 kill :: Gen InstrNode LoadLabel
 kill ((blk, ln), instr) = case instr of
-    (St idf reg) -> [LoadLabel (reg, idf)]
+    (St idf reg) -> [LoadLabel (0, idf)]
+    (Ld reg idf) -> [LoadLabel (reg, "")]
+    (Lc reg cons) -> [LoadLabel (reg, "")]
     (Add reg _ _) -> [LoadLabel (reg, "")]
     (Sub reg _ _) -> [LoadLabel (reg, "")]
     (Mul reg _ _) -> [LoadLabel (reg, "")]
