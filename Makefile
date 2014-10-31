@@ -16,12 +16,6 @@ Parser.hs: Parser.y Token.hs
 optimizer: Optimizer.hs Cfg.hs Deadcode.hs Unreachable.hs RedReg.hs Parser.hs Lexer.hs Genkill.hs Assembly.hs Util.hs Deadstore.hs
 	$(HC) --make -i$(SRCDIR) -o $@ $< 
 
-tester: Tester.hs optimizer Cfg.hs CFGTests.hs TestLib.hs
-	$(HC) --make -i$(SRCDIR):$(TEST_SRC) -o $@ $<
-    
-test: tester
-	./tester
-                    
 clean:
 	rm -f $(SRCDIR)/Lexer.hs
 	rm -f $(SRCDIR)/Parser.hs
@@ -48,10 +42,5 @@ clean:
 	rm -f $(SRCDIR)/Assembly.o
 	rm -f $(SRCDIR)/Util.hi
 	rm -f $(SRCDIR)/Util.o
-	rm -f tester
-	rm -f $(TEST_SRC)/Tester.hi
-	rm -f $(TEST_SRC)/Tester.o
-	rm -f $(TEST_SRC)/TestLib.hi
-	rm -f $(TEST_SRC)/TestLib.o
-	rm -f $(TEST_SRC)/CFGTests.hi
-	rm -f $(TEST_SRC)/CFGTests.o
+	rm -f $(SRCDIR)/Token.hi
+	rm -f $(SRCDIR)/Token.o
