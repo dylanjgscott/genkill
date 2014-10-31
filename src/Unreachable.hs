@@ -71,7 +71,7 @@ unreachableTrans (a:as) (b:bs)
 -- "Forwards" parameter indicates to the genkill framwork which direction it needs to 
 -- traverse the graph. Unreachable code is a forward looking flow analysis problem. 
 -- "makeBlockCfg" passes the block level graphing function defined in the Cfg Module.
--- "union" indicates the meet function out genkill framework should use. In this case a union
+-- "union" indicates the meet function our genkill framework should use. In this case a union
 -- of gen and kill lists as we want all possible paths to a given block to be considered.
 unreachableBlockTransform = 
     fixpoint (runGenKill makeBlockCfg union unreachableGen unreachableKill unreachableTrans Forwards)
