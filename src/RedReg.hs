@@ -59,16 +59,33 @@ redregTrans'' labels n@(idf, instr) =
         -- is acceptable as it indicates a serious logic error
         (ins, outs) = fromJust (lookup n labels)
 
-        newInstr = if not (null ins) then (Ld 0 "changed") else instr
-        --newInstr = case instr of
-        --    ()
+        --newInstr = if not (null ins) then (Ld 0 "changed") else instr
+        newInstr = case instr of
+            (St idf reg) -> St idf (getLowestReg ins reg)
+            (Add reg1 reg2 reg3) -> Add reg1 (getLowestReg ins reg2) (getLowestReg ins reg3)
+            (Sub reg1 reg2 reg3) -> Sub reg1 (getLowestReg ins reg2) (getLowestReg ins reg3)
+            (Mul reg1 reg2 reg3) -> Mul reg1 (getLowestReg ins reg2) (getLowestReg ins reg3)
+            (Div reg1 reg2 reg3) -> Div reg1 (getLowestReg ins reg2) (getLowestReg ins reg3)
+            (Ret reg) -> Ret (getLowestReg ins reg)
+            (Call reg idf regs) -> (Call reg idf (map (getLowestReg ins) regs)) 
+            otherwise -> instr
     in
         newInstr
 
+getLowestReg :: [LoadLabel] -> Reg -> Reg
+getLowestReg labels reg = 
+    if isJust reglab 
+    then (sort (map (fst . unpack) (filter (filterSecond (snd (unpack (fromJust reglab)))) labels))) !! 0
+    else reg
+    where 
+    filterFirst  r (LoadLabel pr) = fst pr == r
+    filterSecond v (LoadLabel pr) = snd pr == v
+    reglab = find (filterFirst reg) labels
+    unpack (LoadLabel x) = x
 
 tmpkill cfg = genkill cfg union gen kill Forwards
 
-redreg = applyBlockTransform (fixpoint (runGenKill makeInstrCfg union gen kill redregTrans Forwards))
+redreg = applyBlockTransform (fixpoint (runGenKill makeInstrCfg intersect gen kill redregTrans Forwards))
 
 -- loosely compared tuple
 
