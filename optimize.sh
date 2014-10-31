@@ -17,6 +17,7 @@ echo -e "\t-u\tTurn on unreachable code elimination"
 echo -e "\t-d\tTurn on dead code elimination."
 echo -e "\t-l\tTurn on load optimisations."
 echo -e "\t-o FILE\tWrite the output to FILE rather than stdout."
+echo -e "\nIf no options are given, all optimisations will be used."
 }
 
 while getopts hudlo: opt; do
