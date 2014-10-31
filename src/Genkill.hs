@@ -6,13 +6,23 @@ import Data.List
 
 import Cfg
 
+-- Specify which way to traverse the graph
 data Direction = Forwards | Backwards
                deriving Eq
 
+-- Function to join to lists of labels
 type Meet c = [c] -> [c] -> [c]
+
+-- Function to computer the set of generated labels
 type Gen b c = b -> [c]
+
+-- Function to compute the set of killed labels
 type Kill b c = b -> [c]
+
+-- Map containing each node and its input and output labels
 type Labels b c = [(b, ([c], [c]))]
+
+-- Transformation function reads the output of gen/kill
 type Transform a b c = Labels b c -> [a] -> [a]
 
 -- Generate all the in and out labels for all the nodes in a graph.
@@ -24,7 +34,8 @@ genkill
     -> Kill b c
     -> Direction
     -> Labels b c
-genkill (Cfg ns es) meet gen kill direction = [(x, (labelin n, labelout n)) | n@(CfgNode x) <- ns]
+genkill (Cfg ns es) meet gen kill direction
+    = [(x, (labelin n, labelout n)) | n@(CfgNode x) <- ns]
 
     where
 
