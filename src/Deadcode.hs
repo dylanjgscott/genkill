@@ -8,8 +8,6 @@ import Genkill
 import Assembly
 import Util
 
-import Debug.Trace
-
 -- Return a list of all the registers used by an instruction
 use :: InstrNode -> [Reg]
 use ((_, _), instr) = case instr of
@@ -43,7 +41,7 @@ def ((_, _), instr) = case instr of
 
 -- Remove dead code from a list of blocks
 deadcodeTrans :: Transform Block InstrNode Reg
-deadcodeTrans flowdata blocks = map (removeDeadcode (trace (show flowdata) flowdata)) blocks
+deadcodeTrans flowdata blocks = map (removeDeadcode flowdata) blocks
 
 -- Remove dead code from a single block
 removeDeadcode :: Labels InstrNode Reg -> Block -> Block
@@ -56,7 +54,7 @@ removeDeadcode flowdata (Block bknum instrs) = Block bknum liveInstrs
 
     -- List of dead registers during the execution of an instruction
     liveRegs :: InstrNode -> [Reg]
-    liveRegs x = fst . fromJust $ lookup x flowdata
+    liveRegs x = snd . fromJust $ lookup x flowdata
 
     -- Returns true only if an instruction is live
     isLive :: InstrNode -> Bool

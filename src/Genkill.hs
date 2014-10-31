@@ -3,7 +3,6 @@
 module Genkill where
 
 import Data.List
-import Debug.Trace
 
 import Cfg
 
@@ -18,7 +17,7 @@ type Transform a b c = Labels b c -> [a] -> [a]
 
 -- Generate all the in and out labels for all the nodes in a graph.
 genkill
-    :: forall b c . (Eq b, Eq c, Show c)
+    :: forall b c . (Eq b, Eq c, Show c, Show b)
     => Cfg b
     -> Meet c
     -> Gen b c
@@ -54,12 +53,12 @@ genkill (Cfg ns es) meet gen kill direction = [(x, (labelin n, labelout n)) | n@
     labelout :: CfgNode b -> [c]
     labelout node
         | direction == Forwards = trans node (labelin node)
-        | direction == Backwards = foldl meet first (trace (show succ) succ)
+        | direction == Backwards = foldl meet first succ
         where
             first = if not (null succ) then succ !! 0 else []
             succ  = [labelin s | s <- Cfg.succ es node]
 
-runGenKill :: forall a b c . (Eq b, Eq c, Show c)
+runGenKill :: forall a b c . (Eq b, Eq c, Show c, Show b)
        => MakeCfg a b
        -> Meet c
        -> Gen b c
