@@ -1,20 +1,29 @@
 module Util where
 
-import Cfg
-import Genkill
 import Assembly
 import Data.List
 
+
+-- Perform fixed point operation on an entity given a valid
+-- transform function
 fixpoint :: Eq a => (a -> a) -> a -> a
 fixpoint f x
     | fx == x = x
     | otherwise = fixpoint f (fx)
     where fx = f x
 
+-- Wrap a program such that an optimizations is applied to every function
 applyBlockTransform :: ([Block] -> [Block]) -> Program -> Program
 applyBlockTransform _ [] = []
 applyBlockTransform t ((Function id args blocks):fs) =
     Function id args (t blocks) : applyBlockTransform t fs
+
+
+-- Generate the (Block number, Line number) to Instruction pairs needed
+-- for an instruction based GenKill graph (so that the transformation)
+-- is reversible
+mapBlockToInstr :: Integer -> [Instruction] -> [((Integer, Integer), Instruction)]
+mapBlockToInstr blk instructs = (zip (zip [blk,blk..] [0..]) instructs)
 
 
 -- Pretty printing functions, simple traversal of data structure

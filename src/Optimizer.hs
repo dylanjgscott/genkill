@@ -21,6 +21,9 @@ import Cfg
 noop :: Program -> Program
 noop p = p
 
+-- apply every function in a list to an entity
+-- with the output of one function being the input
+-- of the next
 frobinate :: [a -> a] -> a -> a
 frobinate [] x = x
 frobinate (f:fs) x = frobinate fs (f x)
@@ -45,10 +48,16 @@ main = do
 
     fileContents <- readFile filename
 
+    -- Parse the assembly program into an AST using alex and happy
     let program = parse . alexScanTokens $ fileContents
 
+    -- identify which optimizations to perform 
     let optimisations = parseOptions options
 
+    -- perform fixpoint over all the optimizations
+    -- arguably not needed but removed the need to ensure that
+    -- redundant load is performed before dead code for example
     let optimizer = fixpoint (frobinate optimisations)
 
+    -- output the optimized program
     putStr . showProgram $ optimizer program
