@@ -9,7 +9,7 @@
             (ld r5 tlp)
             (lc r4 2)
             (st tmp r4)
-            (ret r5)
+            (ret r3)
         )
     )
 )
