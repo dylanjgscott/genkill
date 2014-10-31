@@ -71,6 +71,10 @@ redregTrans'' labels n@(idf, instr) =
             (Sub reg1 reg2 reg3) -> Sub reg1 (getLowestReg ins reg2) (getLowestReg ins reg3)
             (Mul reg1 reg2 reg3) -> Mul reg1 (getLowestReg ins reg2) (getLowestReg ins reg3)
             (Div reg1 reg2 reg3) -> Div reg1 (getLowestReg ins reg2) (getLowestReg ins reg3)
+            (Eq reg1 reg2 reg3) -> Eq reg1 (getLowestReg ins reg2) (getLowestReg ins reg3)
+            (Lt reg1 reg2 reg3) -> Lt reg1 (getLowestReg ins reg2) (getLowestReg ins reg3)
+            (Gt reg1 reg2 reg3) -> Gt reg1 (getLowestReg ins reg2) (getLowestReg ins reg3)
+            (Br reg blk1 blk2) -> Br (getLowestReg ins reg) blk1 blk2
             (Ret reg) -> Ret (getLowestReg ins reg)
             (Call reg idf regs) -> (Call reg idf (map (getLowestReg ins) regs)) 
             otherwise -> instr
