@@ -13,7 +13,7 @@ data LoadLabel = LoadLabel (Reg, Id)
 
 
 instance Eq LoadLabel where
-    (LoadLabel (x,y)) == (LoadLabel (a,b)) = (x == a || y == b)
+    (LoadLabel (x,y)) == (LoadLabel (a,b)) = (x == a) -- && y == b)
 
 -- [(val, reg1)]
 
@@ -83,12 +83,12 @@ getLowestReg labels reg =
     reglab = find (filterFirst reg) labels
     unpack (LoadLabel x) = x
 
-tmpkill cfg = genkill cfg union gen kill Forwards
 
 redreg = applyBlockTransform (fixpoint (runGenKill makeInstrCfg intersect gen kill redregTrans Forwards))
 
--- loosely compared tuple
+--tmpkill cfg = genkill cfg intersect gen kill Forwards
 
+-- loosely compared tuple
 -- (a,b) == (a,c)
 -- (a,b) == (c,b)
 
