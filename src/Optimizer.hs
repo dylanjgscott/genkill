@@ -18,6 +18,7 @@ import RedReg
 import Util
 import Cfg
 
+
 noop :: Program -> Program
 noop p = p
 
@@ -28,6 +29,8 @@ frobinate :: [a -> a] -> a -> a
 frobinate [] x = x
 frobinate (f:fs) x = frobinate fs (f x)
 
+-- Generate a list of optimization functions based on
+-- command line options.
 optimisationOptions :: [(String, Program -> Program)]
 optimisationOptions = [
         ("-u", unreachable),

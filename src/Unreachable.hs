@@ -23,13 +23,13 @@ import Util
 -- Unreachable Code.
 --
 -- Basic Idea:
--- Block zero generate a label "True".
--- As the Gen/Kill algorithm traverses the graph of blocks this label with 
--- flow to all blocks connected to block zero.
+-- Block zero generatea label "True".
+-- As the Gen/Kill algorithm traverses the graph of blocks this label will 
+-- flow to all descendant blocks of block zero.
 -- No block can kill the connection of a predecessor to block zero.
--- We can then check the labels in produced by Gen/Kill. 
+-- We can then check the labels produced by Gen/Kill. 
 -- An empty list (No true value) indicates no connection to block zero
--- and therefore unreachable block has been found and can be eliminated.
+-- and therefore an unreachable block has been found and can be eliminated.
 -- Any block with True values in their labels must be connected to block zero
 -- and therefore is left in the graph.
 ---------------------------------------------------------------------------
@@ -37,8 +37,8 @@ import Util
 
 -------------------------------
 -- Gen Function.
--- If encountered block is block zero it generate the label "True"
--- Othwise no labels are generated.
+-- As the entry point for a given function block zero generates the label "True"
+-- Otherwise no labels are generated.
 unreachableGen :: Gen Block Bool
 unreachableGen (Block num _) 
     | num == 0 = [True]
@@ -54,27 +54,32 @@ unreachableKill _ = []
 
 ------------------------------
 -- Transform function
--- Check provded Block labels tuple 
--- for True values - ie connection to block zero.
--- Delete if not.
+-- Check provided Block labels tuple 
+-- True values - ie connection to block zero - are returned.
+-- If empty list indicates no connection to block zero and we disregard the block
 unreachableTrans :: Transform Block Block Bool
 unreachableTrans _ [] = []
 unreachableTrans (a:as) (b:bs) 
-    | labelsIn  == [] = unreachableTrans as bs
+    | labels  == [] = unreachableTrans as bs
     | otherwise = b : unreachableTrans as bs
     where
-        labelsIn    = snd (snd a)
+        labels    = snd (snd a)
 ------------------------------
 -- helper function.
--- Packages up needed parameters and passes everything to
+-- Packages up module provided parameters and passes everything to
 -- the fixpoint function
+-- "Forwards" parameter indicates to the genkill framwork which direction it needs to 
+-- traverse the graph. Unreachable code is a forward looking flow analysis problem. 
+-- "makeBlockCfg" passes the block level graphing function defined in the Cfg Module.
+-- "union" indicates the meet function out genkill framework should use. In this case a union
+-- of gen and kill lists as we want all possible paths to a given block to be considered.
 unreachableBlockTransform = 
     fixpoint (runGenKill makeBlockCfg union unreachableGen unreachableKill unreachableTrans Forwards)
 
 ------------------------------
 -- Wrapper for wrapper. 
--- Takes and return the program and
+-- Takes and returns the program and
 -- Will map the genkill function
--- onto the entire program.
+-- onto the entire program function by function.
 unreachable :: Program -> Program 
 unreachable p = applyBlockTransform unreachableBlockTransform p
