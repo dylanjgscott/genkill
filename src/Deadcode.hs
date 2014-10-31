@@ -43,7 +43,7 @@ def ((_, _), instr) = case instr of
 
 -- Remove dead code from a list of blocks
 deadcodeTrans :: Transform Block InstrNode Reg
-deadcodeTrans flowdata blocks = map (removeDeadcode flowdata) blocks
+deadcodeTrans flowdata blocks = map (removeDeadcode (trace (show flowdata) flowdata)) blocks
 
 -- Remove dead code from a single block
 removeDeadcode :: Labels InstrNode Reg -> Block -> Block
@@ -61,7 +61,6 @@ removeDeadcode flowdata (Block bknum instrs) = Block bknum liveInstrs
     -- Returns true only if an instruction is live
     isLive :: InstrNode -> Bool
     isLive instr 
-        | trace (show instr ++ "\t" ++ show (liveRegs instr)) False = False
         | def instr == [] = True
         | all (\x -> x `notElem` (liveRegs instr)) (def instr) = False
         | otherwise = True
