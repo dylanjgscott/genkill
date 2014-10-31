@@ -18,7 +18,6 @@ applyBlockTransform t ((Function id args blocks):fs) =
 
 
 -- Pretty printing functions, simple traversal of data structure
--- Fairly self explanatory
 showProgram :: Program -> String
 showProgram prog =  "( "
                  ++ intercalate "\n  " (map showFunction prog)

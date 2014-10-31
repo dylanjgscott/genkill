@@ -25,6 +25,8 @@ data Instruction = Lc Assembly.Reg Assembly.Num
                  | Call Assembly.Reg Assembly.Id [Assembly.Reg]
                  deriving (Eq)
 
+-- For the re-assembly of the program into valid intermediate code we need
+-- to add some pretty-printing instances for the Instruction type.
 instance Show Instruction where
     show (Lc a b)   = "lc " ++  "r" ++ show  a ++ " "  ++ show b
     show (Ld a b)   = "ld " ++  "r" ++ show  a ++ " "  ++ b
