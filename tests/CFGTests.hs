@@ -1,7 +1,7 @@
 module CFGTests where
 
 import TestLib
-import CFG
+import Cfg
 
 import Test.HUnit
 import Control.Exception
