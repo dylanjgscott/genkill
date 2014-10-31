@@ -20,6 +20,11 @@ echo -e "\t-o FILE\tWrite the output to FILE rather than stdout."
 echo -e "\nIf no options are given, all optimisations will be used."
 }
 
+if [ $# -eq 0 ]; then
+    usage
+    exit
+fi
+
 while getopts hudlo: opt; do
 	case $opt in
 	\?)
@@ -39,8 +44,8 @@ while getopts hudlo: opt; do
 	l)
 		LOAD="-l"
 		;;
-	o)
-		OUTFILE=$OPTARG
+	o)  
+        OUTFILE=$OPTARG
 	esac
 done
 
@@ -53,6 +58,7 @@ if [ ! -f $OPTIMIZER ] || [ ! -x $OPTIMIZER ]; then
 	usage
 	exit -1
 fi
+
 
 if [ -z $INFILE ]; then
 	echo -e "no file specified"
