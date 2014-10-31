@@ -28,7 +28,7 @@ frobinate (f:fs) x = frobinate fs (f x)
 optimisationOptions :: [(String, Program -> Program)]
 optimisationOptions = [
         ("-u", unreachable),
-        ("-d", deadcode . deadstore),
+        ("-d", deadcode),
         ("-l", redreg)
     ]
 
