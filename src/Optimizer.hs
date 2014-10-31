@@ -18,10 +18,6 @@ import RedReg
 import Util
 import Cfg
 
-
-noop :: Program -> Program
-noop p = p
-
 -- apply every function in a list to an entity
 -- with the output of one function being the input
 -- of the next
@@ -29,8 +25,8 @@ frobinate :: [a -> a] -> a -> a
 frobinate [] x = x
 frobinate (f:fs) x = frobinate fs (f x)
 
--- Generate a list of optimization functions based on
--- command line options.
+
+-- list of options and their coresponding optimisation functions
 optimisationOptions :: [(String, Program -> Program)]
 optimisationOptions = [
         ("-u", unreachable),
@@ -38,6 +34,7 @@ optimisationOptions = [
         ("-l", redreg)
     ]
 
+-- Take a list of options and make a list of optimisation functions
 parseOptions :: [String] -> [Program -> Program]
 parseOptions = map (\x -> fromJust (lookup x optimisationOptions))
 

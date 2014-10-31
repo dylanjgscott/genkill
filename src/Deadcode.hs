@@ -8,14 +8,9 @@ import Genkill
 import Assembly
 import Util
 
-use :: Gen Block Reg
-use (Block _ is) = foldl union [] (map usedRegs is)
-
-def :: Kill Block Reg
-def (Block _ is) = foldl union [] (map definedRegs is)
-
-usedRegs :: Instruction -> [Reg]
-usedRegs reg = case reg of
+-- Return a list of all the registers used by an instruction
+use :: InstrNode -> [Reg]
+use ((_, _), instr) = case instr of
     (St _ r) -> [r]
     (Add _ r1 r2) -> [r1, r2]
     (Sub _ r1 r2) -> [r1, r2]
@@ -29,8 +24,9 @@ usedRegs reg = case reg of
     (Call _ _ rs) -> rs
     otherwise -> []
 
-definedRegs :: Instruction -> [Reg]
-definedRegs reg = case reg of
+-- Return a list of all the registers defined by an instruction
+def :: InstrNode -> [Reg]
+def ((_, _), instr) = case instr of
     (Lc r _) -> [r]
     (Ld r _) -> [r]
     (Add r _ _) -> [r]
@@ -43,22 +39,43 @@ definedRegs reg = case reg of
     (Call r _ _) -> [r]
     otherwise -> []
 
-deadcodeTrans :: Transform Block Block Reg
-deadcodeTrans _ [] = []
-deadcodeTrans flowdata (b:bs) = deleteDeadcode b usedRegs : deadcodeTrans flowdata bs
-    where
-    usedRegs = fst . fromJust $ lookup b flowdata
+-- Remove dead code from a list of blocks
+deadcodeTrans :: Transform Block InstrNode Reg
+deadcodeTrans flowdata blocks = map (removeDeadcode flowdata) blocks
 
-deleteDeadcode :: Block -> [Reg] -> Block
-deleteDeadcode (Block num ins) liveRegs = Block num liveIns
+-- Remove dead code from a single block
+removeDeadcode :: Labels InstrNode Reg -> Block -> Block
+removeDeadcode flowdata (Block bknum instrs) = Block bknum liveInstrs
     where
-    liveIns :: [Instruction]
-    liveIns = filter isAlive ins
-    isAlive :: Instruction -> Bool
-    isAlive i = (definedRegs i) \\ liveRegs == []
-        
+
+    -- List of live instructions in this block
+    liveInstrs :: [Instruction]
+    liveInstrs = map unpackInstr (filter isLive packedInstrs)
+
+    -- List of live registers during the execution of an instruction
+    liveRegs :: InstrNode -> [Reg]
+    liveRegs x = snd . fromJust $ lookup x flowdata
+
+    -- Returns true only if an instruction is live
+    isLive :: InstrNode -> Bool
+    isLive instr 
+        | def instr == [] = True
+        | all (\x -> x `notElem` (liveRegs instr)) (def instr) = False
+        | otherwise = True
+
+    -- Unpack an instruction from the graph type
+    unpackInstr :: InstrNode -> Instruction 
+    unpackInstr ((_, _), i) = i
+
+    -- A list of packed instructions to match the graph exactly
+    packedInstrs :: [InstrNode]
+    packedInstrs = zip (zip [bknum,bknum..] [0..]) instrs
+
+
+-- Apply the deadcode removal framework using fixpoint
 deadcodeBlockTransform :: [Block] -> [Block]
-deadcodeBlockTransform = fixpoint (runGenKill makeBlockCfg union use def deadcodeTrans Backwards)
+deadcodeBlockTransform = fixpoint (runGenKill makeInstrCfg union use def deadcodeTrans Backwards)
 
+-- Apply the deadcode removal to each function in a program
 deadcode :: Program -> Program
-deadcode p = applyBlockTransform deadcodeBlockTransform p
+deadcode = applyBlockTransform deadcodeBlockTransform
