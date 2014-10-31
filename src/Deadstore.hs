@@ -20,11 +20,11 @@ def ((_, _), instr) = case instr of
     (St x _) -> [x]
     otherwise -> []
 
--- Remove dead code from a list of blocks
+-- Remove dead variables from a list of blocks
 deadstoreTrans :: Transform Block InstrNode Id
 deadstoreTrans flowdata blocks = map (removeDeadstore flowdata) blocks
 
--- Remove dead code from a single block
+-- Remove dead variables from a single block
 removeDeadstore :: Labels InstrNode Id -> Block -> Block
 removeDeadstore flowdata (Block bknum instrs) = Block bknum liveInstrs
     where
@@ -33,7 +33,7 @@ removeDeadstore flowdata (Block bknum instrs) = Block bknum liveInstrs
     liveInstrs :: [Instruction]
     liveInstrs = map unpackInstr (filter isLive packedInstrs)
 
-    -- List of dead registers during the execution of an instruction
+    -- List of live variables during the execution of an instruction
     liveRegs :: InstrNode -> [Id]
     liveRegs x = snd . fromJust $ lookup x flowdata
 
@@ -53,10 +53,10 @@ removeDeadstore flowdata (Block bknum instrs) = Block bknum liveInstrs
     packedInstrs = zip (zip [bknum,bknum..] [0..]) instrs
 
 
--- Apply the dead store instruction removal framework using fixpoint
+-- Apply the dead variable instruction removal framework using fixpoint
 deadstoreBlockTransform :: [Block] -> [Block]
 deadstoreBlockTransform = fixpoint (runGenKill makeInstrCfg union use def deadstoreTrans Backwards)
 
--- Apply the dead store instruction removal to each function in a program
+-- Apply the dead variable instruction removal to each function in a program
 deadstore :: Program -> Program
 deadstore = applyBlockTransform deadstoreBlockTransform

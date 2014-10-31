@@ -52,7 +52,7 @@ removeDeadcode flowdata (Block bknum instrs) = Block bknum liveInstrs
     liveInstrs :: [Instruction]
     liveInstrs = map unpackInstr (filter isLive packedInstrs)
 
-    -- List of dead registers during the execution of an instruction
+    -- List of live registers during the execution of an instruction
     liveRegs :: InstrNode -> [Reg]
     liveRegs x = snd . fromJust $ lookup x flowdata
 
