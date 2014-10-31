@@ -2,7 +2,7 @@
     (0  (ld r1 n)
         (add r2 r1 r1)
         (st tmp r2)
-        (ld r3 9)
+        (lc r3 9)
         (ret r3) ) 
     (1  (lc r4 0)
         (ret r4) ) ))
