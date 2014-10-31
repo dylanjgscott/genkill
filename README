@@ -1,0 +1,37 @@
+# optimize COMP3109 Assignment 3
+
+* Rafael Mazzoldi
+* Alec Posney
+* Dylan Scott 312113625
+
+## Usage
+
+The input filename must be given to the shell script.
+
+	-o OUT_FILE	Write the optimised program to OUT_FILE
+			If this option is not given output to STDOUT
+
+	-u		Turn on the removal of unreachable code
+	-d		Turn on the removal of dead code
+	-l		Turn on load optimisations
+
+If no optimisation options are given, all optimisations will be used.
+
+## Examples
+
+Optimise 'foo' with all optimisations
+	./optimize.sh foo
+
+Optimise 'foo' with all optimisations and output to 'bar'
+	./optimize.sh -o bar foo
+
+Optimise 'foo' with only unreachable optimisations and output to 'bar'
+	./optimize.sh -uo bar foo
+
+## Languages and Tools
+
+Glasgow Haskell Compiler	7.8.3
+Alex				3.1.3
+Happy				1.19.3
+GNU Make			4.0
+GNU Bash			4.3.30
