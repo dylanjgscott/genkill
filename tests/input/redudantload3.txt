@@ -1,0 +1,15 @@
+(
+    (main  (n)
+        (0
+            (lc r1 1)
+            (st tmp r1)
+            (ld r2 tmp)
+            (ld r3 tmp)
+            (st tlp r2)
+            (ld r5 tlp)
+            (lc r4 2)
+            (st tmp r4)
+            (ret r5)
+        )
+    )
+)

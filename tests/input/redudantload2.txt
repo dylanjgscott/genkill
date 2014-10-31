@@ -1,0 +1,27 @@
+(
+    (main  (n)
+        (0
+            (ld r1 x)
+            (br r1 1 2)
+        )
+        (1 
+            (lc r2 1)
+            (add r1 r1 r2)
+            (br r1 3 3)
+        )
+        (2
+            (ld r2 x)
+            (lc r3 2)
+            (st tmp r3)
+            (lc r14 5)
+            (st tmp r14)
+            (ld r15 tmp)
+            (add r1 r2 r15)
+            (br r1 3 3)
+        )
+        (3
+            (ld r5 x)
+            (ret r5)
+        )
+    )
+)
